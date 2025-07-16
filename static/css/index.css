@@ -133,5 +133,25 @@ body {
   font-size: smaller;
 }
 
+/* === Interactive Video Comparison Styles === */
+.video-compare-container {
+  position: relative;
+  width: 100%;
+  padding-bottom: 56.25%; /* 16:9 aspect ratio */
+  height: 0;
+  overflow: hidden;
+  margin-bottom: 1rem;
+}
+
+.video-compare-container video,
+.video-compare-container canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 8px;
+}
 
 
