@@ -135,23 +135,38 @@ body {
 
 /* === Interactive Video Comparison Styles === */
 .video-compare-container {
-  position: relative;
   width: 100%;
-  padding-bottom: 56.25%; /* 16:9 aspect ratio */
-  height: 0;
-  overflow: hidden;
-  margin-bottom: 1rem;
+  margin-bottom: 2rem;
 }
 
-.video-compare-container video,
-.video-compare-container canvas {
+.video-wrapper {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16/9;
+  overflow: hidden;
+  cursor: ew-resize;
+}
+
+.video-layer {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  object-fit: contain;
-  border-radius: 8px;
+  object-fit: cover;
 }
 
+.video-layer:nth-child(2) {
+  clip-path: inset(0 50% 0 0); /* initially show left half of overlay */
+}
 
+.divider {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 2px;
+  height: 100%;
+  background-color: black;
+  z-index: 10;
+  pointer-events: none;
+}
