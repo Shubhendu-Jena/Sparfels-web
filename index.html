@@ -457,34 +457,44 @@
       };
   
       const setupDrag = (dividerEl, isFirst) => {
-        let isDragging = false;
-  
-        dividerEl.addEventListener('mousedown', () => {
-          isDragging = true;
-        });
-  
-        window.addEventListener('mouseup', () => {
-          isDragging = false;
-        });
-  
-        window.addEventListener('mousemove', (e) => {
-          if (!isDragging) return;
-          const rect = wrapper.getBoundingClientRect();
-          let percent = ((e.clientX - rect.left) / rect.width) * 100;
-          percent = Math.min(Math.max(percent, 0), 100);
-  
-          if (isFirst) {
-            const right = parseFloat(divider2.style.left || 66.66);
-            updateClipPaths(percent, right);
-          } else {
-            const left = parseFloat(divider1.style.left || 33.33);
-            updateClipPaths(left, percent);
-          }
-        });
+      let isDragging = false;
+    
+      const startDrag = (e) => {
+        isDragging = true;
+        e.preventDefault();
       };
-  
-      setupDrag(divider1, true);
-      setupDrag(divider2, false);
+    
+      const stopDrag = () => isDragging = false;
+    
+      const doDrag = (e) => {
+        if (!isDragging) return;
+        const rect = wrapper.getBoundingClientRect();
+        let clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        let percent = ((clientX - rect.left) / rect.width) * 100;
+        percent = Math.min(Math.max(percent, 0), 100);
+    
+        if (isFirst) {
+          const right = parseFloat(divider2.style.left || 66.66);
+          updateClipPaths(percent, right);
+        } else {
+          const left = parseFloat(divider1.style.left || 33.33);
+          updateClipPaths(left, percent);
+        }
+      };
+    
+      dividerEl.addEventListener("mousedown", startDrag);
+      dividerEl.addEventListener("touchstart", startDrag);
+    
+      window.addEventListener("mouseup", stopDrag);
+      window.addEventListener("touchend", stopDrag);
+    
+      window.addEventListener("mousemove", doDrag);
+      window.addEventListener("touchmove", doDrag);
+    };
+    
+    setupDrag(divider1, true);
+    setupDrag(divider2, false);
+
   
       // Initialize default clip and divider positions
       updateClipPaths(33.33, 66.66);
