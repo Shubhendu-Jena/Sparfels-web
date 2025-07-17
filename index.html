@@ -406,5 +406,43 @@
 
     <!-- End of Statcounter Code -->
 
+  <script>
+  window.addEventListener('DOMContentLoaded', () => {
+    const videoPairs = [
+      ['videoA_scan24_1', 'videoB_scan24_1'],
+      ['videoA_scan24_2', 'videoB_scan24_2'],
+      ['videoA_scan24_3', 'videoB_scan24_3'],
+      ['videoA_scan24_4', 'videoB_scan24_4']
+    ];
+  
+    videoPairs.forEach(([idA, idB]) => {
+      const videoA = document.getElementById(idA);
+      const videoB = document.getElementById(idB);
+  
+      const tryPlayBoth = () => {
+        videoA.currentTime = 0;
+        videoB.currentTime = 0;
+        const playA = videoA.play();
+        const playB = videoB.play();
+  
+        if (playA?.catch) playA.catch((e) => console.warn(idA, e));
+        if (playB?.catch) playB.catch((e) => console.warn(idB, e));
+      };
+  
+      if (videoA.readyState >= 2 && videoB.readyState >= 2) {
+        tryPlayBoth();
+      } else {
+        videoA.onloadeddata = () => {
+          if (videoB.readyState >= 2) tryPlayBoth();
+        };
+        videoB.onloadeddata = () => {
+          if (videoA.readyState >= 2) tryPlayBoth();
+        };
+      }
+    });
+  });
+  </script>
+
+
   </body>
   </html>
