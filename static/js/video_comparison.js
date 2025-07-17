@@ -1,47 +1,34 @@
-function resizeAndPlay(video) {
-  const canvas = document.getElementById(video.id + "Merge");
-  const container = video.parentElement;
+document.addEventListener("DOMContentLoaded", () => {
+  const wrappers = document.querySelectorAll(".video-wrapper");
 
-  const width = video.videoWidth || video.clientWidth;
-  const height = video.videoHeight || video.clientHeight;
+  wrappers.forEach(wrapper => {
+    const baseVideo = wrapper.querySelector("video:nth-child(1)");
+    const overlayVideo = wrapper.querySelector("video:nth-child(2)");
+    const divider = wrapper.querySelector(".divider");
 
-  canvas.width = width;
-  canvas.height = height;
-  canvas.style.width = video.clientWidth + "px";
-  canvas.style.height = video.clientHeight + "px";
-
-  const ctx = canvas.getContext("2d");
-
-  const overlayVideo = document.createElement("video");
-  overlayVideo.src = video.dataset.altSrc;
-  overlayVideo.loop = true;
-  overlayVideo.muted = true;
-  overlayVideo.playsInline = true;
-  overlayVideo.autoplay = true;
-
-  overlayVideo.addEventListener("loadeddata", () => {
-    overlayVideo.play();
-
-    let sliderX = canvas.width / 2;
-
-    canvas.addEventListener("mousemove", (e) => {
-      const rect = canvas.getBoundingClientRect();
-      sliderX = e.clientX - rect.left;
+    // Sync time every loop
+    [baseVideo, overlayVideo].forEach(video => {
+      video.addEventListener("loadeddata", () => {
+        video.play();
+      });
     });
 
-    function render() {
-      if (video.readyState >= 2 && overlayVideo.readyState >= 2) {
-        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-        ctx.save();
-        ctx.beginPath();
-        ctx.rect(0, 0, sliderX, canvas.height);
-        ctx.clip();
-        ctx.drawImage(overlayVideo, 0, 0, canvas.width, canvas.height);
-        ctx.restore();
+    function syncVideos() {
+      if (Math.abs(baseVideo.currentTime - overlayVideo.currentTime) > 0.05) {
+        overlayVideo.currentTime = baseVideo.currentTime;
       }
-      requestAnimationFrame(render);
+      requestAnimationFrame(syncVideos);
     }
 
-    render();
+    syncVideos();
+
+    // Drag logic
+    wrapper.addEventListener("mousemove", (e) => {
+      const rect = wrapper.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const percent = (x / rect.width) * 100;
+      overlayVideo.style.clipPath = `inset(0 ${100 - percent}% 0 0)`;
+      divider.style.left = `${percent}%`;
+    });
   });
-}
+});
