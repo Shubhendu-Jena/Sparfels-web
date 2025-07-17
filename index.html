@@ -492,6 +492,32 @@
   });
   </script>
 
+  <script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const observers = [];
+  
+    document.querySelectorAll(".video-wrapper-triple").forEach(wrapper => {
+      const observer = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const videos = wrapper.querySelectorAll("video");
+            videos.forEach(v => {
+              if (!v.src) {
+                v.src = v.dataset.src;
+                v.load();
+                v.oncanplaythrough = () => v.play().catch(() => {});
+              }
+            });
+          }
+        });
+      }, { threshold: 0.3 });
+  
+      observer.observe(wrapper);
+      observers.push(observer);
+    });
+  });
+  </script>
+
 
   </body>
   </html>
