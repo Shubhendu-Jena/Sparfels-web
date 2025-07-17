@@ -178,8 +178,8 @@ body {
   width: 100%;
   aspect-ratio: 16/9;
   overflow: hidden;
-  cursor: ew-resize;
   background: #000;
+  cursor: default;
 }
 
 .video-compare-container.triple .video-layer {
@@ -209,7 +209,8 @@ body {
   height: 100%;
   background-color: black;
   z-index: 3;
-  pointer-events: none;
+  cursor: ew-resize;
+  pointer-events: auto;
 }
 
 .divider-triple-1 {
@@ -219,3 +220,4 @@ body {
 .divider-triple-2 {
   left: 66.66%;
 }
+
