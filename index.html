@@ -408,41 +408,73 @@
     <!-- End of Statcounter Code -->
 
   <script>
-    window.addEventListener('DOMContentLoaded', () => {
-      const videoTriplets = [
-        ['videoA_dtu_scan24', 'videoB_dtu_scan24', 'videoC_dtu_scan24'],
-        ['videoA_dtu_scan65', 'videoB_dtu_scan65', 'videoC_dtu_scan65'],
-        ['videoA_bmvs_scan120', 'videoB_bmvs_scan120', 'videoC_bmvs_scan120'],
-        ['videoA_bmvs_scan350', 'videoB_bmvs_scan350', 'videoC_bmvs_scan350']
-      ];
+  window.addEventListener('DOMContentLoaded', () => {
+    const videoSets = [
+      'dtu_scan24',
+      'dtu_scan65',
+      'bmvs_scan120',
+      'bmvs_scan350'
+    ];
   
-      videoTriplets.forEach(([idA, idB, idC]) => {
-        const videoA = document.getElementById(idA);
-        const videoB = document.getElementById(idB);
-        const videoC = document.getElementById(idC);
+    // Sync and play all three videos in each comparison
+    videoSets.forEach(id => {
+      const A = document.getElementById(`videoA_${id}`);
+      const B = document.getElementById(`videoB_${id}`);
+      const C = document.getElementById(`videoC_${id}`);
   
-        const tryPlayAll = () => {
-          [videoA, videoB, videoC].forEach(v => {
-            v.currentTime = 0;
-            const playPromise = v.play();
-            if (playPromise?.catch) playPromise.catch(e => console.warn(v.id, e));
-          });
+      const playAll = () => {
+        A.currentTime = 0;
+        B.currentTime = 0;
+        C.currentTime = 0;
+        A.play().catch(e => console.warn(id + ' A', e));
+        B.play().catch(e => console.warn(id + ' B', e));
+        C.play().catch(e => console.warn(id + ' C', e));
+      };
+  
+      if (A.readyState >= 2 && B.readyState >= 2 && C.readyState >= 2) {
+        playAll();
+      } else {
+        A.onloadeddata = () => {
+          if (B.readyState >= 2 && C.readyState >= 2) playAll();
         };
+        B.onloadeddata = () => {
+          if (A.readyState >= 2 && C.readyState >= 2) playAll();
+        };
+        C.onloadeddata = () => {
+          if (A.readyState >= 2 && B.readyState >= 2) playAll();
+        };
+      }
   
-        const allReady = () => [videoA, videoB, videoC].every(v => v.readyState >= 2);
+      // Add interactive divider drag logic
+      const wrapper = document.getElementById(`wrapper_${id}`);
+      const divider1 = document.getElementById(`divider1_${id}`);
+      const divider2 = document.getElementById(`divider2_${id}`);
   
-        if (allReady()) {
-          tryPlayAll();
-        } else {
-          const checkAndPlay = () => {
-            if (allReady()) tryPlayAll();
-          };
-          videoA.onloadeddata = checkAndPlay;
-          videoB.onloadeddata = checkAndPlay;
-          videoC.onloadeddata = checkAndPlay;
-        }
-      });
+      const onMouseMove = (e) => {
+        const rect = wrapper.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const percent = (x / rect.width) * 100;
+  
+        const clamped1 = Math.min(Math.max(percent, 10), 90);
+        const clamped2 = Math.min(Math.max(percent + 33.33, 33.34), 99.9);
+  
+        B.style.clipPath = `inset(0 ${100 - clamped1}% 0 0)`;
+        C.style.clipPath = `inset(0 0 0 ${clamped1}%)`;
+  
+        divider1.style.left = `${clamped1}%`;
+        divider2.style.left = `${clamped2}%`;
+      };
+  
+      const onDown = () => {
+        window.addEventListener('mousemove', onMouseMove);
+        window.addEventListener('mouseup', () => {
+          window.removeEventListener('mousemove', onMouseMove);
+        }, { once: true });
+      };
+  
+      wrapper.addEventListener('mousedown', onDown);
     });
+  });
   </script>
 
 
