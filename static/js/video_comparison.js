@@ -1,33 +1,41 @@
 document.addEventListener("DOMContentLoaded", () => {
-  const wrappers = document.querySelectorAll(".video-wrapper");
+  const pairs = document.querySelectorAll(".video-wrapper");
 
-  wrappers.forEach(wrapper => {
-    const baseVideo = wrapper.querySelector("video:nth-child(1)");
-    const overlayVideo = wrapper.querySelector("video:nth-child(2)");
+  pairs.forEach(wrapper => {
+    const videoA = wrapper.querySelector("video:nth-child(1)");
+    const videoB = wrapper.querySelector("video:nth-child(2)");
     const divider = wrapper.querySelector(".divider");
 
-    // Sync time every loop
-    [baseVideo, overlayVideo].forEach(video => {
-      video.addEventListener("loadeddata", () => {
-        video.play();
-      });
-    });
+    let bothReady = 0;
 
-    function syncVideos() {
-      if (Math.abs(baseVideo.currentTime - overlayVideo.currentTime) > 0.05) {
-        overlayVideo.currentTime = baseVideo.currentTime;
+    const checkReady = () => {
+      bothReady++;
+      if (bothReady === 2) {
+        // Sync play
+        videoA.currentTime = 0;
+        videoB.currentTime = 0;
+        videoA.play();
+        videoB.play();
+        syncLoop();
       }
-      requestAnimationFrame(syncVideos);
+    };
+
+    videoA.addEventListener("loadeddata", checkReady);
+    videoB.addEventListener("loadeddata", checkReady);
+
+    // Keep videos aligned
+    function syncLoop() {
+      if (Math.abs(videoA.currentTime - videoB.currentTime) > 0.03) {
+        videoB.currentTime = videoA.currentTime;
+      }
+      requestAnimationFrame(syncLoop);
     }
 
-    syncVideos();
-
-    // Drag logic
-    wrapper.addEventListener("mousemove", (e) => {
+    // Divider movement
+    wrapper.addEventListener("mousemove", e => {
       const rect = wrapper.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const percent = (x / rect.width) * 100;
-      overlayVideo.style.clipPath = `inset(0 ${100 - percent}% 0 0)`;
+      const percent = ((e.clientX - rect.left) / rect.width) * 100;
+      videoB.style.clipPath = `inset(0 ${100 - percent}% 0 0)`;
       divider.style.left = `${percent}%`;
     });
   });
