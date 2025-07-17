@@ -163,6 +163,7 @@
 </section>
 <!-- End paper abstract -->
 
+
 <section class="section">
   <div class="container is-max-desktop">
     <h2 class="title is-3 has-text-centered">Interactive Comparisons</h2>
@@ -170,60 +171,48 @@
 
       <!-- Comparison 1 -->
       <div class="column is-half">
-        <div class="video-compare-container" style="text-align:center;">
-          <video class="video"
-                 id="scan24_1"
-                 loop autoplay muted playsinline
-                 src="static/videos/scan_dtu_24_sparfels.mp4"
-                 data-alt-src="static/videos/scan_dtu_24_sparsecraft.mp4"
-                 onplay="resizeAndPlay(this)">
-          </video>
-          <canvas height="0" class="videoMerge" id="scan24_1Merge"></canvas>
+        <div class="video-compare-container">
+          <div class="video-wrapper" id="wrapper_scan24_1">
+            <video id="base_scan24_1" class="video-layer" muted loop autoplay playsinline src="static/videos/scan_dtu_24_sparfels.mp4"></video>
+            <video id="overlay_scan24_1" class="video-layer" muted loop autoplay playsinline src="static/videos/scan_dtu_24_sparsecraft.mp4"></video>
+            <div class="divider" id="divider_scan24_1"></div>
+          </div>
           <p class="has-text-centered"><small>Scan 24: Sparfels vs. SparseCraft</small></p>
         </div>
       </div>
 
       <!-- Comparison 2 -->
       <div class="column is-half">
-        <div class="video-compare-container" style="text-align:center;">
-          <video class="video"
-                 id="scan24_2"
-                 loop autoplay muted playsinline
-                 src="static/videos/scan_dtu_24_sparfels.mp4"
-                 data-alt-src="static/videos/scan_dtu_24_sparsecraft.mp4"
-                 onplay="resizeAndPlay(this)">
-          </video>
-          <canvas height="0" class="videoMerge" id="scan24_2Merge"></canvas>
+        <div class="video-compare-container">
+          <div class="video-wrapper" id="wrapper_scan24_2">
+            <video id="base_scan24_2" class="video-layer" muted loop autoplay playsinline src="static/videos/scan_dtu_24_sparfels.mp4"></video>
+            <video id="overlay_scan24_2" class="video-layer" muted loop autoplay playsinline src="static/videos/scan_dtu_24_sparsecraft.mp4"></video>
+            <div class="divider" id="divider_scan24_2"></div>
+          </div>
           <p class="has-text-centered"><small>Scan 24: Sparfels vs. SparseCraft</small></p>
         </div>
       </div>
 
       <!-- Comparison 3 -->
       <div class="column is-half">
-        <div class="video-compare-container" style="text-align:center;">
-          <video class="video"
-                 id="scan24_3"
-                 loop autoplay muted playsinline
-                 src="static/videos/scan_dtu_24_sparfels.mp4"
-                 data-alt-src="static/videos/scan_dtu_24_sparsecraft.mp4"
-                 onplay="resizeAndPlay(this)">
-          </video>
-          <canvas height="0" class="videoMerge" id="scan24_3Merge"></canvas>
+        <div class="video-compare-container">
+          <div class="video-wrapper" id="wrapper_scan24_3">
+            <video id="base_scan24_3" class="video-layer" muted loop autoplay playsinline src="static/videos/scan_dtu_24_sparfels.mp4"></video>
+            <video id="overlay_scan24_3" class="video-layer" muted loop autoplay playsinline src="static/videos/scan_dtu_24_sparsecraft.mp4"></video>
+            <div class="divider" id="divider_scan24_3"></div>
+          </div>
           <p class="has-text-centered"><small>Scan 24: Sparfels vs. SparseCraft</small></p>
         </div>
       </div>
 
       <!-- Comparison 4 -->
       <div class="column is-half">
-        <div class="video-compare-container" style="text-align:center;">
-          <video class="video"
-                 id="scan24_4"
-                 loop autoplay muted playsinline
-                 src="static/videos/scan_dtu_24_sparfels.mp4"
-                 data-alt-src="static/videos/scan_dtu_24_sparsecraft.mp4"
-                 onplay="resizeAndPlay(this)">
-          </video>
-          <canvas height="0" class="videoMerge" id="scan24_4Merge"></canvas>
+        <div class="video-compare-container">
+          <div class="video-wrapper" id="wrapper_scan24_4">
+            <video id="base_scan24_4" class="video-layer" muted loop autoplay playsinline src="static/videos/scan_dtu_24_sparfels.mp4"></video>
+            <video id="overlay_scan24_4" class="video-layer" muted loop autoplay playsinline src="static/videos/scan_dtu_24_sparsecraft.mp4"></video>
+            <div class="divider" id="divider_scan24_4"></div>
+          </div>
           <p class="has-text-centered"><small>Scan 24: Sparfels vs. SparseCraft</small></p>
         </div>
       </div>
@@ -231,7 +220,6 @@
     </div>
   </div>
 </section>
-
 
 
 <!-- Results -->
