@@ -416,63 +416,78 @@
       'bmvs_scan350'
     ];
   
-    // Sync and play all three videos in each comparison
     videoSets.forEach(id => {
-      const A = document.getElementById(`videoA_${id}`);
-      const B = document.getElementById(`videoB_${id}`);
-      const C = document.getElementById(`videoC_${id}`);
-  
-      const playAll = () => {
-        A.currentTime = 0;
-        B.currentTime = 0;
-        C.currentTime = 0;
-        A.play().catch(e => console.warn(id + ' A', e));
-        B.play().catch(e => console.warn(id + ' B', e));
-        C.play().catch(e => console.warn(id + ' C', e));
-      };
-  
-      if (A.readyState >= 2 && B.readyState >= 2 && C.readyState >= 2) {
-        playAll();
-      } else {
-        A.onloadeddata = () => {
-          if (B.readyState >= 2 && C.readyState >= 2) playAll();
-        };
-        B.onloadeddata = () => {
-          if (A.readyState >= 2 && C.readyState >= 2) playAll();
-        };
-        C.onloadeddata = () => {
-          if (A.readyState >= 2 && B.readyState >= 2) playAll();
-        };
-      }
-  
-      // Add interactive divider drag logic
+      const videoA = document.getElementById(`videoA_${id}`);
+      const videoB = document.getElementById(`videoB_${id}`);
+      const videoC = document.getElementById(`videoC_${id}`);
       const wrapper = document.getElementById(`wrapper_${id}`);
       const divider1 = document.getElementById(`divider1_${id}`);
       const divider2 = document.getElementById(`divider2_${id}`);
   
-      const onMouseMove = (e) => {
-        const rect = wrapper.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const percent = (x / rect.width) * 100;
-  
-        const clamped1 = Math.min(Math.max(percent, 10), 90);
-        const clamped2 = Math.min(Math.max(percent + 33.33, 33.34), 99.9);
-  
-        B.style.clipPath = `inset(0 ${100 - clamped1}% 0 0)`;
-        C.style.clipPath = `inset(0 0 0 ${clamped1}%)`;
-  
-        divider1.style.left = `${clamped1}%`;
-        divider2.style.left = `${clamped2}%`;
+      const syncAndPlay = () => {
+        videoA.currentTime = 0;
+        videoB.currentTime = 0;
+        videoC.currentTime = 0;
+        videoA.play().catch(e => console.warn(e));
+        videoB.play().catch(e => console.warn(e));
+        videoC.play().catch(e => console.warn(e));
       };
   
-      const onDown = () => {
-        window.addEventListener('mousemove', onMouseMove);
+      const tryPlay = () => {
+        if (
+          videoA.readyState >= 2 &&
+          videoB.readyState >= 2 &&
+          videoC.readyState >= 2
+        ) {
+          syncAndPlay();
+        }
+      };
+  
+      videoA.onloadeddata = tryPlay;
+      videoB.onloadeddata = tryPlay;
+      videoC.onloadeddata = tryPlay;
+  
+      const updateClipPaths = (p1, p2) => {
+        const left = Math.min(p1, p2);
+        const right = Math.max(p1, p2);
+        videoB.style.clipPath = `inset(0 ${100 - left}% 0 0)`;
+        videoC.style.clipPath = `inset(0 0 0 ${right}%)`;
+        divider1.style.left = `${left}%`;
+        divider2.style.left = `${right}%`;
+      };
+  
+      const setupDrag = (dividerEl, isFirst) => {
+        let isDragging = false;
+  
+        dividerEl.addEventListener('mousedown', () => {
+          isDragging = true;
+        });
+  
         window.addEventListener('mouseup', () => {
-          window.removeEventListener('mousemove', onMouseMove);
-        }, { once: true });
+          isDragging = false;
+        });
+  
+        window.addEventListener('mousemove', (e) => {
+          if (!isDragging) return;
+          const rect = wrapper.getBoundingClientRect();
+          let percent = ((e.clientX - rect.left) / rect.width) * 100;
+          percent = Math.min(Math.max(percent, 0), 100);
+  
+          if (isFirst) {
+            const right = parseFloat(divider2.style.left || 66.66);
+            updateClipPaths(percent, right);
+          } else {
+            const left = parseFloat(divider1.style.left || 33.33);
+            updateClipPaths(left, percent);
+          }
+        });
       };
   
-      wrapper.addEventListener('mousedown', onDown);
+      setupDrag(divider1, true);
+      setupDrag(divider2, false);
+  
+      // Initialize default clip and divider positions
+      updateClipPaths(33.33, 66.66);
     });
   });
   </script>
