@@ -207,69 +207,67 @@
 <!-- End paper abstract -->
 
 
-<div class="column is-half">
-  <div class="video-compare-container triple">
-    <div class="video-wrapper-triple" id="wrapper_dtu_scan24">
-      <video id="videoA_dtu_scan24" class="video-layer" playsinline muted preload="none" loop
-             data-src="static/videos/scan_dtu_24_sparfels.mp4"></video>
-      <video id="videoB_dtu_scan24" class="video-layer" playsinline muted preload="none" loop
-             data-src="static/videos/scan_dtu_24_instantsplat.mp4"></video>
-      <video id="videoC_dtu_scan24" class="video-layer" playsinline muted preload="none" loop
-             data-src="static/videos/scan_dtu_24_sparsecraft.mp4"></video>
-      <div class="divider-triple-1" id="divider1_dtu_scan24"></div>
-      <div class="divider-triple-2" id="divider2_dtu_scan24"></div>
+<!-- HTML: Minimal Triple Video Comparison Grid -->
+<div class="columns is-multiline">
+
+  <!-- DTU Scan 24 -->
+  <div class="column is-half" data-videoset="dtu_scan24">
+    <div class="video-compare-container triple">
+      <div class="video-wrapper-triple">
+        <video class="video-layer videoA" muted playsinline preload="none" loop data-src="static/videos/scan_dtu_24_sparfels.mp4"></video>
+        <video class="video-layer videoB" muted playsinline preload="none" loop data-src="static/videos/scan_dtu_24_instantsplat.mp4"></video>
+        <video class="video-layer videoC" muted playsinline preload="none" loop data-src="static/videos/scan_dtu_24_sparsecraft.mp4"></video>
+        <div class="divider divider1"></div>
+        <div class="divider divider2"></div>
+      </div>
+      <p class="has-text-centered"><small>DTU Scan 24: Sparfels vs. InstantSplat2DGS vs. SparseCraft</small></p>
     </div>
-    <p class="has-text-centered"><small>DTU Scan 24: Sparfels vs. InstantSplat2DGS vs. SparseCraft</small></p>
   </div>
+
+  <!-- DTU Scan 65 -->
+  <div class="column is-half" data-videoset="dtu_scan65">
+    <div class="video-compare-container triple">
+      <div class="video-wrapper-triple">
+        <video class="video-layer videoA" muted playsinline preload="none" loop data-src="static/videos/scan_dtu_65_sparfels.mp4"></video>
+        <video class="video-layer videoB" muted playsinline preload="none" loop data-src="static/videos/scan_dtu_65_instantsplat.mp4"></video>
+        <video class="video-layer videoC" muted playsinline preload="none" loop data-src="static/videos/scan_dtu_65_sparsecraft.mp4"></video>
+        <div class="divider divider1"></div>
+        <div class="divider divider2"></div>
+      </div>
+      <p class="has-text-centered"><small>DTU Scan 65: Sparfels vs. InstantSplat2DGS vs. SparseCraft</small></p>
+    </div>
+  </div>
+
+  <!-- BMVS Scan 120 -->
+  <div class="column is-half" data-videoset="bmvs_scan120">
+    <div class="video-compare-container triple">
+      <div class="video-wrapper-triple">
+        <video class="video-layer videoA" muted playsinline preload="none" loop data-src="static/videos/scan_bmvs_120_sparfels.mp4"></video>
+        <video class="video-layer videoB" muted playsinline preload="none" loop data-src="static/videos/scan_bmvs_120_uforecon.mp4"></video>
+        <video class="video-layer videoC" muted playsinline preload="none" loop data-src="static/videos/scan_bmvs_120_colmap.mp4"></video>
+        <div class="divider divider1"></div>
+        <div class="divider divider2"></div>
+      </div>
+      <p class="has-text-centered"><small>BMVS Scan 120: Sparfels vs. UfoRecon vs. Colmap</small></p>
+    </div>
+  </div>
+
+  <!-- BMVS Scan 350 -->
+  <div class="column is-half" data-videoset="bmvs_scan350">
+    <div class="video-compare-container triple">
+      <div class="video-wrapper-triple">
+        <video class="video-layer videoA" muted playsinline preload="none" loop data-src="static/videos/scan_bmvs_350_sparfels.mp4"></video>
+        <video class="video-layer videoB" muted playsinline preload="none" loop data-src="static/videos/scan_bmvs_350_uforecon.mp4"></video>
+        <video class="video-layer videoC" muted playsinline preload="none" loop data-src="static/videos/scan_bmvs_350_colmap.mp4"></video>
+        <div class="divider divider1"></div>
+        <div class="divider divider2"></div>
+      </div>
+      <p class="has-text-centered"><small>BMVS Scan 350: Sparfels vs. UfoRecon vs. Colmap</small></p>
+    </div>
+  </div>
+
 </div>
 
-<div class="column is-half">
-  <div class="video-compare-container triple">
-    <div class="video-wrapper-triple" id="wrapper_dtu_scan65">
-      <video id="videoA_dtu_scan65" class="video-layer" playsinline muted preload="none" loop
-             data-src="static/videos/scan_dtu_65_sparfels.mp4"></video>
-      <video id="videoB_dtu_scan65" class="video-layer" playsinline muted preload="none" loop
-             data-src="static/videos/scan_dtu_65_instantsplat.mp4"></video>
-      <video id="videoC_dtu_scan65" class="video-layer" playsinline muted preload="none" loop
-             data-src="static/videos/scan_dtu_65_sparsecraft.mp4"></video>
-      <div class="divider-triple-1" id="divider1_dtu_scan65"></div>
-      <div class="divider-triple-2" id="divider2_dtu_scan65"></div>
-    </div>
-    <p class="has-text-centered"><small>DTU Scan 65: Sparfels vs. InstantSplat2DGS vs. SparseCraft</small></p>
-  </div>
-</div>
-
-<div class="column is-half">
-  <div class="video-compare-container triple">
-    <div class="video-wrapper-triple" id="wrapper_bmvs_scan120">
-      <video id="videoA_bmvs_scan120" class="video-layer" playsinline muted preload="none" loop
-             data-src="static/videos/scan_bmvs_120_sparfels.mp4"></video>
-      <video id="videoB_bmvs_scan120" class="video-layer" playsinline muted preload="none" loop
-             data-src="static/videos/scan_bmvs_120_uforecon.mp4"></video>
-      <video id="videoC_bmvs_scan120" class="video-layer" playsinline muted preload="none" loop
-             data-src="static/videos/scan_bmvs_120_colmap.mp4"></video>
-      <div class="divider-triple-1" id="divider1_bmvs_scan120"></div>
-      <div class="divider-triple-2" id="divider2_bmvs_scan120"></div>
-    </div>
-    <p class="has-text-centered"><small>BMVS Scan 120: Sparfels vs. UfoRecon vs. Colmap</small></p>
-  </div>
-</div>
-
-<div class="column is-half">
-  <div class="video-compare-container triple">
-    <div class="video-wrapper-triple" id="wrapper_bmvs_scan350">
-      <video id="videoA_bmvs_scan350" class="video-layer" playsinline muted preload="none" loop
-             data-src="static/videos/scan_bmvs_350_sparfels.mp4"></video>
-      <video id="videoB_bmvs_scan350" class="video-layer" playsinline muted preload="none" loop
-             data-src="static/videos/scan_bmvs_350_uforecon.mp4"></video>
-      <video id="videoC_bmvs_scan350" class="video-layer" playsinline muted preload="none" loop
-             data-src="static/videos/scan_bmvs_350_colmap.mp4"></video>
-      <div class="divider-triple-1" id="divider1_bmvs_scan350"></div>
-      <div class="divider-triple-2" id="divider2_bmvs_scan350"></div>
-    </div>
-    <p class="has-text-centered"><small>BMVS Scan 350: Sparfels vs. UfoRecon vs. Colmap</small></p>
-  </div>
-</div>
 
 
 
