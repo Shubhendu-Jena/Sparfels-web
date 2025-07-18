@@ -418,33 +418,96 @@
     <!-- End of Statcounter Code -->
 
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const sets = ['dtu_scan24','dtu_scan65','bmvs_scan120','bmvs_scan350'];
-      sets.forEach(id => {
-        const container = document.querySelector(`[data-videoset="${id}"]`);
-        const a = container.querySelector(".videoA");
-        const b = container.querySelector(".videoB");
-        const c = container.querySelector(".videoC");
-        const div1 = container.querySelector(".divider1");
-        const div2 = container.querySelector(".divider2");
-        const wrapper = container.querySelector(".video-wrapper-triple");
+  document.addEventListener('DOMContentLoaded', () => {
+    const sets = document.querySelectorAll('[data-videoset]');
   
-        [a, b, c].forEach(v => {
-          v.src = v.dataset.src;
-          v.preload = 'none';
-          v.loop = true;
+    // Intersection Observer to lazy load video sources
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
+  
+        const wrapper = entry.target;
+        const videos = wrapper.querySelectorAll('video');
+  
+        videos.forEach(video => {
+          if (!video.src && video.dataset.src) {
+            video.src = video.dataset.src;
+            video.load();
+          }
         });
-
-        a.oncanplay = () => {
-          b.currentTime = a.currentTime;
-          c.currentTime = a.currentTime;
-          b.playbackRate = a.playbackRate;
-          c.playbackRate = a.playbackRate;
-          a.play();
-          b.play();
-          c.play();
-        };
   
+        syncVideos(videos);
+        observer.unobserve(wrapper);
+      });
+    }, { threshold: 0.3 });
+  
+    sets.forEach(set => {
+      const wrapper = set.querySelector('.video-wrapper-triple');
+      const videoA = set.querySelector('.videoA');
+      const videoB = set.querySelector('.videoB');
+      const videoC = set.querySelector('.videoC');
+      const divider1 = set.querySelector('.divider1');
+      const divider2 = set.querySelector('.divider2');
+  
+      // Observe wrapper for lazy load
+      observer.observe(wrapper);
+  
+      // === Drag Logic for Triple Divider ===
+      const updateClipPaths = (l, r) => {
+        videoB.style.clipPath = `inset(0 ${100 - l}% 0 0)`;
+        videoC.style.clipPath = `inset(0 0 0 ${r}%)`;
+        divider1.style.left = `${l}%`;
+        divider2.style.left = `${r}%`;
+      };
+  
+      let active = null;
+      const startDrag = (index) => (e) => {
+        active = index;
+        wrapper.setPointerCapture(e.pointerId);
+        e.preventDefault();
+      };
+  
+      const stopDrag = () => active = null;
+  
+      const handleMove = (e) => {
+        if (active === null) return;
+        const rect = wrapper.getBoundingClientRect();
+        let pct = ((e.clientX - rect.left) / rect.width) * 100;
+        pct = Math.max(0, Math.min(100, pct));
+  
+        const l = parseFloat(divider1.style.left || '33.33');
+        const r = parseFloat(divider2.style.left || '66.66');
+  
+        if (active === 0 && pct < r) updateClipPaths(pct, r);
+        if (active === 1 && pct > l) updateClipPaths(l, pct);
+      };
+  
+      divider1.addEventListener('pointerdown', startDrag(0));
+      divider2.addEventListener('pointerdown', startDrag(1));
+      wrapper.addEventListener('pointerup', stopDrag);
+      wrapper.addEventListener('pointercancel', stopDrag);
+      wrapper.addEventListener('pointermove', handleMove);
+  
+      updateClipPaths(33.33, 66.66);
+    });
+  
+    // === Sync Videos ===
+    function syncVideos(videos) {
+      let loaded = 0;
+      const [a, b, c] = videos;
+  
+      const onCanPlay = () => {
+        if (++loaded < 3) return;
+  
+        // Start all videos at the same time
+        [b, c].forEach(v => {
+          v.currentTime = a.currentTime;
+          v.playbackRate = a.playbackRate;
+        });
+  
+        [a, b, c].forEach(v => v.play().catch(() => {}));
+  
+        // Start sync loop
         const sync = () => {
           const t = a.currentTime;
           if (Math.abs(b.currentTime - t) > 0.05) b.currentTime = t;
@@ -452,81 +515,12 @@
           requestAnimationFrame(sync);
         };
         sync();
-  
-        const update = (l, r) => {
-          b.style.clipPath = `inset(0 ${100 - l}% 0 0)`;
-          c.style.clipPath = `inset(0 0 0 ${r}%)`;
-          div1.style.left = `${l}%`;
-          div2.style.left = `${r}%`;
-        };
-  
-        let drag = null;
-        [div1, div2].forEach((div, idx) => {
-          div.addEventListener('pointerdown', e => {
-            drag = idx; wrapper.setPointerCapture(e.pointerId);
-          });
-        });
-        wrapper.addEventListener('pointerup', () => drag = null);
-        wrapper.addEventListener('pointermove', e => {
-          if (drag == null) return;
-          const rect = wrapper.getBoundingClientRect();
-          let pct = ((e.clientX - rect.left) / rect.width) * 100;
-          pct = Math.max(0, Math.min(100, pct));
-          const other = drag === 0 
-            ? parseFloat(div2.style.left || 66.66) 
-            : parseFloat(div1.style.left || 33.33);
-          if (drag === 0 && pct < other) update(pct, other);
-          if (drag === 1 && pct > other) update(other, pct);
-        });
-        update(33.33, 66.66);
-      });
-    });
-  </script>
-
-  <script>
-  document.addEventListener('DOMContentLoaded', () => {
-    document.querySelectorAll('.video-layer').forEach(v => {
-      v.preload = 'none'; // avoid loading upfront
-    });
-  
-    const io = new IntersectionObserver(entries => {
-      entries.forEach(e => {
-        if (e.isIntersecting) {
-          const vids = e.target.querySelectorAll('.video-layer');
-          vids.forEach(v => {
-            if (!v.src) {
-              v.src = v.dataset.src;
-              v.load();
-              v.oncanplay = () => v.play().catch(() => {});
-            }
-          });
-          io.unobserve(e.target);
-        }
-      });
-    }, { threshold: 0.3 });
-  
-    document.querySelectorAll('.video-wrapper-triple')
-      .forEach(wrapper => io.observe(wrapper));
-  });
-  </script>
-
-  <script>
-  document.addEventListener('DOMContentLoaded', () => {
-    ['dtu_scan24','dtu_scan65','bmvs_scan120','bmvs_scan350'].forEach(id => {
-      const cont = document.querySelector(`[data-videoset="${id}"]`);
-      const a = cont.querySelector('.videoA');
-      const b = cont.querySelector('.videoB');
-      const c = cont.querySelector('.videoC');
-  
-      const sync = () => {
-        const t = a.currentTime;
-        if (Math.abs(b.currentTime - t) > 0.03) b.currentTime = t;
-        if (Math.abs(c.currentTime - t) > 0.03) c.currentTime = t;
-        requestAnimationFrame(sync);
       };
   
-      a.oncanplay = () => { b.currentTime = a.currentTime; c.currentTime = a.currentTime; a.play(); b.play(); c.play(); sync(); };
-    });
+      videos.forEach(v => {
+        v.oncanplay = onCanPlay;
+      });
+    }
   });
   </script>
 
