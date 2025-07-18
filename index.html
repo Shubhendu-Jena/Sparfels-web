@@ -419,108 +419,106 @@
   document.addEventListener('DOMContentLoaded', () => {
     const sets = document.querySelectorAll('[data-videoset]');
   
-    // Intersection Observer to lazy load video sources
+    // Lazy-load and sync when in view
     const observer = new IntersectionObserver(entries => {
       entries.forEach(entry => {
         if (!entry.isIntersecting) return;
   
-        const wrapper = entry.target;
-        const videos = wrapper.querySelectorAll('video');
+        const container = entry.target;
+        const videoA = container.querySelector('.videoA');
+        const videoB = container.querySelector('.videoB');
+        const videoC = container.querySelector('.videoC');
   
-        videos.forEach(video => {
-          if (!video.src && video.dataset.src) {
-            video.src = video.dataset.src;
-            video.load();
+        // Load sources
+        [videoA, videoB, videoC].forEach(v => {
+          if (!v.src && v.dataset.src) {
+            v.src = v.dataset.src;
+            v.load();
           }
         });
   
-        syncVideos(videos);
-        observer.unobserve(wrapper);
+        // Once all videos can play, sync and play
+        let loaded = 0;
+        const onReady = () => {
+          loaded++;
+          if (loaded < 3) return;
+  
+          [videoB, videoC].forEach(v => {
+            v.currentTime = videoA.currentTime;
+            v.playbackRate = videoA.playbackRate;
+          });
+  
+          [videoA, videoB, videoC].forEach(v => v.play().catch(() => {}));
+  
+          // Continuous sync
+          const sync = () => {
+            const t = videoA.currentTime;
+            if (Math.abs(videoB.currentTime - t) > 0.05) videoB.currentTime = t;
+            if (Math.abs(videoC.currentTime - t) > 0.05) videoC.currentTime = t;
+            requestAnimationFrame(sync);
+          };
+          sync();
+        };
+  
+        [videoA, videoB, videoC].forEach(v => {
+          v.addEventListener('canplay', onReady, { once: true });
+        });
+  
+        observer.unobserve(container);
       });
     }, { threshold: 0.3 });
   
     sets.forEach(set => {
       const wrapper = set.querySelector('.video-wrapper-triple');
-      const videoA = set.querySelector('.videoA');
-      const videoB = set.querySelector('.videoB');
-      const videoC = set.querySelector('.videoC');
       const divider1 = set.querySelector('.divider1');
       const divider2 = set.querySelector('.divider2');
+      const videoB = set.querySelector('.videoB');
+      const videoC = set.querySelector('.videoC');
   
-      // Observe wrapper for lazy load
-      observer.observe(wrapper);
+      // Observe for lazy loading
+      observer.observe(set);
   
-      // === Drag Logic for Triple Divider ===
-      const updateClipPaths = (l, r) => {
+      // Divider dragging logic
+      const updateClip = (l, r) => {
         videoB.style.clipPath = `inset(0 ${100 - l}% 0 0)`;
         videoC.style.clipPath = `inset(0 0 0 ${r}%)`;
         divider1.style.left = `${l}%`;
         divider2.style.left = `${r}%`;
       };
   
-      let active = null;
-      const startDrag = (index) => (e) => {
-        active = index;
+      updateClip(33.33, 66.66); // Initial divider positions
+  
+      let dragging = null;
+  
+      const startDrag = (which) => (e) => {
+        dragging = which;
         wrapper.setPointerCapture(e.pointerId);
         e.preventDefault();
       };
   
-      const stopDrag = () => active = null;
+      const stopDrag = () => { dragging = null; };
   
-      const handleMove = (e) => {
-        if (active === null) return;
+      const handleDrag = (e) => {
+        if (dragging === null) return;
         const rect = wrapper.getBoundingClientRect();
         let pct = ((e.clientX - rect.left) / rect.width) * 100;
         pct = Math.max(0, Math.min(100, pct));
-  
         const l = parseFloat(divider1.style.left || '33.33');
         const r = parseFloat(divider2.style.left || '66.66');
   
-        if (active === 0 && pct < r) updateClipPaths(pct, r);
-        if (active === 1 && pct > l) updateClipPaths(l, pct);
+        if (dragging === 1 && pct < r) updateClip(pct, r);
+        if (dragging === 2 && pct > l) updateClip(l, pct);
       };
   
-      divider1.addEventListener('pointerdown', startDrag(0));
-      divider2.addEventListener('pointerdown', startDrag(1));
+      divider1.addEventListener('pointerdown', startDrag(1));
+      divider2.addEventListener('pointerdown', startDrag(2));
+      wrapper.addEventListener('pointermove', handleDrag);
       wrapper.addEventListener('pointerup', stopDrag);
       wrapper.addEventListener('pointercancel', stopDrag);
-      wrapper.addEventListener('pointermove', handleMove);
-  
-      updateClipPaths(33.33, 66.66);
     });
-  
-    // === Sync Videos ===
-    function syncVideos(videos) {
-      let loaded = 0;
-      const [a, b, c] = videos;
-  
-      const onCanPlay = () => {
-        if (++loaded < 3) return;
-  
-        // Start all videos at the same time
-        [b, c].forEach(v => {
-          v.currentTime = a.currentTime;
-          v.playbackRate = a.playbackRate;
-        });
-  
-        [a, b, c].forEach(v => v.play().catch(() => {}));
-  
-        // Start sync loop
-        const sync = () => {
-          const t = a.currentTime;
-          if (Math.abs(b.currentTime - t) > 0.05) b.currentTime = t;
-          if (Math.abs(c.currentTime - t) > 0.05) c.currentTime = t;
-          requestAnimationFrame(sync);
-        };
-        sync();
-      };
-  
-      videos.forEach(v => {
-        v.oncanplay = onCanPlay;
-      });
-    }
   });
   </script>
+
 
 
   </body>
