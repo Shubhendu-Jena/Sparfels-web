@@ -129,6 +129,10 @@ body {
   margin-bottom: 2rem;
 }
 
+.video-compare-container.triple {
+  margin-bottom: 2.5rem;
+}
+
 .video-wrapper {
   position: relative;
   width: 100%;
