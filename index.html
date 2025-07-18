@@ -2,43 +2,13 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <!-- Meta tags for social media banners, these should be filled in appropriatly as they are your "business card" -->
-  <!-- Replace the content tag with appropriate information -->
-  <meta name="description" content="DESCRIPTION META TAG">
-  <meta property="og:title" content="SOCIAL MEDIA TITLE TAG"/>
-  <meta property="og:description" content="SOCIAL MEDIA DESCRIPTION TAG TAG"/>
-  <meta property="og:url" content="URL OF THE WEBSITE"/>
-  <!-- Path to banner image, should be in the path listed below. Optimal dimenssions are 1200X630-->
-  <meta property="og:image" content="static/image/your_banner_image.png" />
-  <meta property="og:image:width" content="1200"/>
-  <meta property="og:image:height" content="630"/>
-
-
-  <meta name="twitter:title" content="TWITTER BANNER TITLE META TAG">
-  <meta name="twitter:description" content="TWITTER BANNER DESCRIPTION META TAG">
-  <!-- Path to banner image, should be in the path listed below. Optimal dimenssions are 1200X600-->
-  <meta name="twitter:image" content="static/images/your_twitter_banner_image.png">
-  <meta name="twitter:card" content="summary_large_image">
-  <!-- Keywords for your paper to be indexed by-->
-  <meta name="keywords" content="KEYWORDS SHOULD BE PLACED HERE">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-
-
   <title>Sparfels - Project Page</title>
-  <!-- <link rel="icon" type="image/x-icon" href="static/images/favicon.ico"> -->
-  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro"
-  rel="stylesheet">
 
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro" rel="stylesheet">
   <link rel="stylesheet" href="static/css/bulma.min.css">
-  <link rel="stylesheet" href="static/css/bulma-carousel.min.css">
-  <link rel="stylesheet" href="static/css/bulma-slider.min.css">
-  <link rel="stylesheet" href="static/css/fontawesome.all.min.css">
-  <link rel="stylesheet"
-  href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
   <link rel="stylesheet" href="static/css/index.css">
 
-  
-  <!-- ✅ Add this block after your CSS imports -->
   <style>
     .video-compare-container {
       margin-bottom: 2rem;
@@ -79,15 +49,6 @@
     .divider1 { left: 33.33%; }
     .divider2 { left: 66.66%; }
   </style>
-
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-  <script src="https://documentcloud.adobe.com/view-sdk/main.js"></script>
-  <script defer src="static/js/fontawesome.all.min.js"></script>
-  <script src="static/js/bulma-carousel.min.js"></script>
-  <script src="static/js/bulma-slider.min.js"></script>
-  <script src="static/js/index.js"></script>
-  <!-- ✅ Add this line to load your interactive video slider -->
-  <script src="static/js/video_comparison.js"></script>
 </head>
 <body>
 
@@ -449,126 +410,68 @@
     <!-- End of Statcounter Code -->
 
   <script>
-  window.addEventListener('DOMContentLoaded', () => {
-    const videoSets = [
-      'dtu_scan24',
-      'dtu_scan65',
-      'bmvs_scan120',
-      'bmvs_scan350'
-    ];
+    document.addEventListener('DOMContentLoaded', () => {
+      const sets = ['dtu_scan24','dtu_scan65','bmvs_scan120','bmvs_scan350'];
+      sets.forEach(id => {
+        const container = document.querySelector(`[data-videoset="${id}"]`);
+        const a = container.querySelector(".videoA");
+        const b = container.querySelector(".videoB");
+        const c = container.querySelector(".videoC");
+        const div1 = container.querySelector(".divider1");
+        const div2 = container.querySelector(".divider2");
+        const wrapper = container.querySelector(".video-wrapper-triple");
   
-    videoSets.forEach(id => {
-      const videoA = document.getElementById(`videoA_${id}`);
-      const videoB = document.getElementById(`videoB_${id}`);
-      const videoC = document.getElementById(`videoC_${id}`);
-      const wrapper = document.getElementById(`wrapper_${id}`);
-      const divider1 = document.getElementById(`divider1_${id}`);
-      const divider2 = document.getElementById(`divider2_${id}`);
-  
-      const syncAndPlay = () => {
-        videoA.currentTime = 0;
-        videoB.currentTime = 0;
-        videoC.currentTime = 0;
-        videoA.play().catch(e => console.warn(e));
-        videoB.play().catch(e => console.warn(e));
-        videoC.play().catch(e => console.warn(e));
-      };
-  
-      const tryPlay = () => {
-        if (
-          videoA.readyState >= 2 &&
-          videoB.readyState >= 2 &&
-          videoC.readyState >= 2
-        ) {
-          syncAndPlay();
-        }
-      };
-  
-      videoA.onloadeddata = tryPlay;
-      videoB.onloadeddata = tryPlay;
-      videoC.onloadeddata = tryPlay;
-  
-      const updateClipPaths = (p1, p2) => {
-        const left = Math.min(p1, p2);
-        const right = Math.max(p1, p2);
-        videoB.style.clipPath = `inset(0 ${100 - left}% 0 0)`;
-        videoC.style.clipPath = `inset(0 0 0 ${right}%)`;
-        divider1.style.left = `${left}%`;
-        divider2.style.left = `${right}%`;
-      };
-  
-      const setupDrag = (dividerEl, isFirst) => {
-      let isDragging = false;
-    
-      const startDrag = (e) => {
-        isDragging = true;
-        e.preventDefault();
-      };
-    
-      const stopDrag = () => isDragging = false;
-    
-      const doDrag = (e) => {
-        if (!isDragging) return;
-        const rect = wrapper.getBoundingClientRect();
-        let clientX = e.touches ? e.touches[0].clientX : e.clientX;
-        let percent = ((clientX - rect.left) / rect.width) * 100;
-        percent = Math.min(Math.max(percent, 0), 100);
-    
-        if (isFirst) {
-          const right = parseFloat(divider2.style.left || 66.66);
-          updateClipPaths(percent, right);
-        } else {
-          const left = parseFloat(divider1.style.left || 33.33);
-          updateClipPaths(left, percent);
-        }
-      };
-    
-      dividerEl.addEventListener("mousedown", startDrag);
-      dividerEl.addEventListener("touchstart", startDrag);
-    
-      window.addEventListener("mouseup", stopDrag);
-      window.addEventListener("touchend", stopDrag);
-    
-      window.addEventListener("mousemove", doDrag);
-      window.addEventListener("touchmove", doDrag);
-    };
-    
-    setupDrag(divider1, true);
-    setupDrag(divider2, false);
-
-  
-      // Initialize default clip and divider positions
-      updateClipPaths(33.33, 66.66);
-    });
-  });
-  </script>
-
-  <script>
-  document.addEventListener("DOMContentLoaded", () => {
-    const observers = [];
-  
-    document.querySelectorAll(".video-wrapper-triple").forEach(wrapper => {
-      const observer = new IntersectionObserver(entries => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            const videos = wrapper.querySelectorAll("video");
-            videos.forEach(v => {
-              if (!v.src) {
-                v.src = v.dataset.src;
-                v.load();
-                v.oncanplaythrough = () => v.play().catch(() => {});
-              }
-            });
-          }
+        [a, b, c].forEach(v => {
+          v.src = v.dataset.src;
+          v.preload = 'auto';
+          v.loop = true;
         });
-      }, { threshold: 0.3 });
   
-      observer.observe(wrapper);
-      observers.push(observer);
+        a.oncanplay = () => {
+          b.currentTime = a.currentTime;
+          c.currentTime = a.currentTime;
+          a.play();
+          b.play();
+          c.play();
+        };
+  
+        const sync = () => {
+          const t = a.currentTime;
+          if (Math.abs(b.currentTime - t) > 0.05) b.currentTime = t;
+          if (Math.abs(c.currentTime - t) > 0.05) c.currentTime = t;
+          requestAnimationFrame(sync);
+        };
+        sync();
+  
+        const update = (l, r) => {
+          b.style.clipPath = `inset(0 ${100 - l}% 0 0)`;
+          c.style.clipPath = `inset(0 0 0 ${r}%)`;
+          div1.style.left = `${l}%`;
+          div2.style.left = `${r}%`;
+        };
+  
+        let drag = null;
+        [div1, div2].forEach((div, idx) => {
+          div.addEventListener('pointerdown', e => {
+            drag = idx; wrapper.setPointerCapture(e.pointerId);
+          });
+        });
+        wrapper.addEventListener('pointerup', () => drag = null);
+        wrapper.addEventListener('pointermove', e => {
+          if (drag == null) return;
+          const rect = wrapper.getBoundingClientRect();
+          let pct = ((e.clientX - rect.left) / rect.width) * 100;
+          pct = Math.max(0, Math.min(100, pct));
+          const other = drag === 0 
+            ? parseFloat(div2.style.left || 66.66) 
+            : parseFloat(div1.style.left || 33.33);
+          if (drag === 0 && pct < other) update(pct, other);
+          if (drag === 1 && pct > other) update(other, pct);
+        });
+        update(33.33, 66.66);
+      });
     });
-  });
   </script>
-
 
   </body>
   </html>
