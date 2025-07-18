@@ -209,9 +209,9 @@
       <div class="column is-half" data-videoset="dtu_scan24">
         <div class="video-compare-container triple">
           <div class="video-wrapper-triple" style="aspect-ratio: 4 / 3;">
-            <video class="video-layer videoA" muted playsinline preload="none" loop data-src="static/videos/scan_dtu_24_sparfels.webm"></video>
-            <video class="video-layer videoB" muted playsinline preload="none" loop data-src="static/videos/scan_dtu_24_instantsplat.webm"></video>
-            <video class="video-layer videoC" muted playsinline preload="none" loop data-src="static/videos/scan_dtu_24_sparsecraft.webm"></video>
+            <video class="video-layer videoA" muted playsinline preload="auto" decoding="async" loop data-src="static/videos/scan_dtu_24_sparfels.webm"></video>
+            <video class="video-layer videoB" muted playsinline preload="auto" decoding="async" loop data-src="static/videos/scan_dtu_24_instantsplat.webm"></video>
+            <video class="video-layer videoC" muted playsinline preload="auto" decoding="async" loop data-src="static/videos/scan_dtu_24_sparsecraft.webm"></video>
             <div class="divider divider1"></div>
             <div class="divider divider2"></div>
           </div>
@@ -223,9 +223,9 @@
       <div class="column is-half" data-videoset="dtu_scan65">
         <div class="video-compare-container triple">
           <div class="video-wrapper-triple" style="aspect-ratio: 4 / 3;">
-            <video class="video-layer videoA" muted playsinline preload="none" loop data-src="static/videos/scan_dtu_65_sparfels.webm"></video>
-            <video class="video-layer videoB" muted playsinline preload="none" loop data-src="static/videos/scan_dtu_65_instantsplat.webm"></video>
-            <video class="video-layer videoC" muted playsinline preload="none" loop data-src="static/videos/scan_dtu_65_sparsecraft.webm"></video>
+            <video class="video-layer videoA" muted playsinline preload="auto" decoding="async" loop data-src="static/videos/scan_dtu_65_sparfels.webm"></video>
+            <video class="video-layer videoB" muted playsinline preload="auto" decoding="async" loop data-src="static/videos/scan_dtu_65_instantsplat.webm"></video>
+            <video class="video-layer videoC" muted playsinline preload="auto" decoding="async" loop data-src="static/videos/scan_dtu_65_sparsecraft.webm"></video>
             <div class="divider divider1"></div>
             <div class="divider divider2"></div>
           </div>
@@ -242,9 +242,9 @@
       <div class="column is-half" data-videoset="bmvs_scan120">
         <div class="video-compare-container triple">
           <div class="video-wrapper-triple" style="aspect-ratio: 370 / 281;">
-            <video class="video-layer videoA" muted playsinline preload="none" loop data-src="static/videos/scan_bmvs_120_sparfels.webm"></video>
-            <video class="video-layer videoB" muted playsinline preload="none" loop data-src="static/videos/scan_bmvs_120_uforecon.webm"></video>
-            <video class="video-layer videoC" muted playsinline preload="none" loop data-src="static/videos/scan_bmvs_120_colmap.webm"></video>
+            <video class="video-layer videoA" muted playsinline preload="auto" decoding="async" loop data-src="static/videos/scan_bmvs_120_sparfels.webm"></video>
+            <video class="video-layer videoB" muted playsinline preload="auto" decoding="async" loop data-src="static/videos/scan_bmvs_120_uforecon.webm"></video>
+            <video class="video-layer videoC" muted playsinline preload="auto" decoding="async" loop data-src="static/videos/scan_bmvs_120_colmap.webm"></video>
             <div class="divider divider1"></div>
             <div class="divider divider2"></div>
           </div>
@@ -256,9 +256,9 @@
       <div class="column is-half" data-videoset="bmvs_scan350">
         <div class="video-compare-container triple">
           <div class="video-wrapper-triple" style="aspect-ratio: 382 / 287;">
-            <video class="video-layer videoA" muted playsinline preload="none" loop data-src="static/videos/scan_bmvs_350_sparfels.webm"></video>
-            <video class="video-layer videoB" muted playsinline preload="none" loop data-src="static/videos/scan_bmvs_350_uforecon.webm"></video>
-            <video class="video-layer videoC" muted playsinline preload="none" loop data-src="static/videos/scan_bmvs_350_colmap.webm"></video>
+            <video class="video-layer videoA" muted playsinline preload="auto" decoding="async" loop data-src="static/videos/scan_bmvs_350_sparfels.webm"></video>
+            <video class="video-layer videoB" muted playsinline preload="auto" decoding="async" loop data-src="static/videos/scan_bmvs_350_uforecon.webm"></video>
+            <video class="video-layer videoC" muted playsinline preload="auto" decoding="async" loop data-src="static/videos/scan_bmvs_350_colmap.webm"></video>
             <div class="divider divider1"></div>
             <div class="divider divider2"></div>
           </div>
@@ -456,6 +456,19 @@
     <!-- End of Statcounter Code -->
 
   <script>
+  function syncTripleVideos(videoA, videoB, videoC) {
+    function step() {
+      const t = videoA.currentTime;
+      if (Math.abs(videoB.currentTime - t) > 0.01) videoB.currentTime = t;
+      if (Math.abs(videoC.currentTime - t) > 0.01) videoC.currentTime = t;
+      videoA.requestVideoFrameCallback(step);
+    }
+    videoA.requestVideoFrameCallback(step);
+  }
+  </script>
+
+
+  <script>
   document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('[data-videoset]').forEach(set => {
       const wrapper = set.querySelector('.video-wrapper-triple');
@@ -489,11 +502,12 @@
           requestAnimationFrame(() => {
             requestAnimationFrame(() => {
               [videoA, videoB, videoC].forEach(v => v.play().catch(() => {}));
-              syncLoop();
+              syncTripleVideos(videoA, videoB, videoC);  // <== Call it here
             });
           });
         }
       };
+
   
       [videoA, videoB, videoC].forEach(v => {
         v.addEventListener('canplaythrough', checkReady, { once: true });
