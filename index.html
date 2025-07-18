@@ -426,10 +426,12 @@
           v.preload = 'auto';
           v.loop = true;
         });
-  
+
         a.oncanplay = () => {
           b.currentTime = a.currentTime;
           c.currentTime = a.currentTime;
+          b.playbackRate = a.playbackRate;
+          c.playbackRate = a.playbackRate;
           a.play();
           b.play();
           c.play();
