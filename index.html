@@ -431,7 +431,7 @@
   
         [a, b, c].forEach(v => {
           v.src = v.dataset.src;
-          v.preload = 'auto';
+          v.preload = 'none';
           v.loop = true;
         });
 
@@ -482,6 +482,54 @@
       });
     });
   </script>
+
+  <script>
+  document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.video-layer').forEach(v => {
+      v.preload = 'none'; // avoid loading upfront
+    });
+  
+    const io = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          const vids = e.target.querySelectorAll('.video-layer');
+          vids.forEach(v => {
+            if (!v.src) {
+              v.src = v.dataset.src;
+              v.load();
+              v.oncanplay = () => v.play().catch(() => {});
+            }
+          });
+          io.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.3 });
+  
+    document.querySelectorAll('.video-wrapper-triple')
+      .forEach(wrapper => io.observe(wrapper));
+  });
+  </script>
+
+  <script>
+  document.addEventListener('DOMContentLoaded', () => {
+    ['dtu_scan24','dtu_scan65','bmvs_scan120','bmvs_scan350'].forEach(id => {
+      const cont = document.querySelector(`[data-videoset="${id}"]`);
+      const a = cont.querySelector('.videoA');
+      const b = cont.querySelector('.videoB');
+      const c = cont.querySelector('.videoC');
+  
+      const sync = () => {
+        const t = a.currentTime;
+        if (Math.abs(b.currentTime - t) > 0.03) b.currentTime = t;
+        if (Math.abs(c.currentTime - t) > 0.03) c.currentTime = t;
+        requestAnimationFrame(sync);
+      };
+  
+      a.oncanplay = () => { b.currentTime = a.currentTime; c.currentTime = a.currentTime; a.play(); b.play(); c.play(); sync(); };
+    });
+  });
+  </script>
+
 
   </body>
   </html>
