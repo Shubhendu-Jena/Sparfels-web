@@ -472,36 +472,35 @@
         }
       });
   
-      // Exact frame lock: wait until all can play
       let ready = 0;
       const onCanPlay = () => {
         if (++ready < 3) return;
   
-        // Hard reset and pause first
         [videoA, videoB, videoC].forEach(v => {
           v.pause();
           v.currentTime = 0;
         });
   
-        // Wait 2 frames then play in sync
-        requestAnimationFrame(() => {
-          requestAnimationFrame(() => {
-            [videoA, videoB, videoC].forEach(v => v.play().catch(() => {}));
-  
-            const sync = () => {
-              const t = videoA.currentTime;
-              if (Math.abs(videoB.currentTime - t) > 0.02) videoB.currentTime = t;
-              if (Math.abs(videoC.currentTime - t) > 0.02) videoC.currentTime = t;
-              requestAnimationFrame(sync);
-            };
-            sync();
+        // Frame-perfect start after buffering
+        Promise.all([videoA, videoB, videoC].map(v => v.readyState >= 3 ? v : new Promise(res => v.oncanplay = res)))
+          .then(() => {
+            requestAnimationFrame(() => {
+              requestAnimationFrame(() => {
+                [videoA, videoB, videoC].forEach(v => v.play().catch(() => {}));
+                // Keep syncing every frame
+                const sync = () => {
+                  const base = videoA.currentTime;
+                  if (Math.abs(videoB.currentTime - base) > 0.01) videoB.currentTime = base;
+                  if (Math.abs(videoC.currentTime - base) > 0.01) videoC.currentTime = base;
+                  requestAnimationFrame(sync);
+                };
+                sync();
+              });
+            });
           });
-        });
       };
   
-      [videoA, videoB, videoC].forEach(v => {
-        v.addEventListener('canplaythrough', onCanPlay, { once: true });
-      });
+      [videoA, videoB, videoC].forEach(v => v.addEventListener('canplaythrough', onCanPlay, { once: true }));
   
       // === Divider Logic ===
       let dragging = null;
@@ -515,13 +514,11 @@
   
       updateClips(33.33, 66.66);
   
-      const startDrag = idx => e => {
-        dragging = idx;
+      const startDrag = id => e => {
+        dragging = id;
         wrapper.setPointerCapture(e.pointerId);
       };
-  
       const stopDrag = () => dragging = null;
-  
       const moveDrag = e => {
         if (!dragging) return;
         const rect = wrapper.getBoundingClientRect();
@@ -542,6 +539,7 @@
     });
   });
   </script>
+
 
 
 
