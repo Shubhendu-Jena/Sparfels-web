@@ -2,7 +2,6 @@ body {
   font-family: 'Noto Sans', sans-serif;
 }
 
-
 .footer .icon-link {
     font-size: 25px;
     color: #000;
@@ -17,7 +16,6 @@ body {
   font-variant: small-caps;
 }
 
-
 .teaser .hero-body {
   padding-top: 0;
   padding-bottom: 3rem;
@@ -27,13 +25,10 @@ body {
   font-family: 'Google Sans', sans-serif;
 }
 
-
-.publication-title {
-}
+.publication-title {}
 
 .publication-banner {
   max-height: parent;
-
 }
 
 .publication-banner video {
@@ -44,8 +39,7 @@ body {
   object-fit: fit;
 }
 
-.publication-header .hero-body {
-}
+.publication-header .hero-body {}
 
 .publication-title {
     font-family: 'Google Sans', sans-serif;
@@ -67,8 +61,7 @@ body {
     font-weight: bolder;
 }
 
-.publication-authors {
-}
+.publication-authors {}
 
 .publication-authors a {
    color: hsl(204, 86%, 53%) !important;
@@ -82,8 +75,7 @@ body {
   display: inline-block;
 }
 
-.publication-banner img {
-}
+.publication-banner img {}
 
 .publication-authors {
   /*color: #4286f4;*/
@@ -94,7 +86,6 @@ body {
     width: 100%;
     height: 0;
     padding-bottom: 56.25%;
-
     overflow: hidden;
     border-radius: 10px !important;
 }
@@ -107,8 +98,7 @@ body {
     height: 100%;
 }
 
-.publication-body img {
-}
+.publication-body img {}
 
 .results-carousel {
   overflow: hidden;
@@ -148,13 +138,16 @@ body {
   background: #000;
 }
 
-.video-layer {
+.video-layer,
+.videoA,
+.videoB,
+.videoC {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  object-fit: cover; /* changed from contain to cover */
+  object-fit: cover;
 }
 
 .video-layer:nth-child(2) {
@@ -165,12 +158,12 @@ body {
 .divider {
   position: absolute;
   top: 0;
-  left: 50%;
   width: 2px;
   height: 100%;
-  background-color: black;
-  z-index: 2;
-  pointer-events: none;
+  background-color: white;
+  z-index: 3;
+  cursor: ew-resize;
+  pointer-events: auto;
 }
 
 .video-wrapper-triple {
@@ -182,42 +175,22 @@ body {
   cursor: default;
 }
 
-.video-compare-container.triple .video-layer {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.video-compare-container.triple .video-layer:nth-child(2) {
+.video-compare-container.triple .video-layer:nth-child(2),
+.videoB {
   clip-path: inset(0 66.66% 0 0);
   z-index: 1;
 }
 
-.video-compare-container.triple .video-layer:nth-child(3) {
+.video-compare-container.triple .video-layer:nth-child(3),
+.videoC {
   clip-path: inset(0 0 0 33.33%);
   z-index: 2;
 }
 
-.divider-triple-1,
-.divider-triple-2 {
-  position: absolute;
-  top: 0;
-  width: 2px;
-  height: 100%;
-  background-color: black;
-  z-index: 3;
-  cursor: ew-resize;
-  pointer-events: auto;
-}
-
-.divider-triple-1 {
+.divider1 {
   left: 33.33%;
 }
 
-.divider-triple-2 {
+.divider2 {
   left: 66.66%;
 }
-
