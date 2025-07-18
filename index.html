@@ -9,46 +9,54 @@
   <link rel="stylesheet" href="static/css/bulma.min.css">
   <link rel="stylesheet" href="static/css/index.css">
 
-  <style>
-    .video-compare-container {
-      margin-bottom: 2rem;
-    }
-    .video-wrapper-triple {
-      position: relative;
-      width: 100%;
-      aspect-ratio: 16 / 9;
-      overflow: hidden;
-      background: #000;
-    }
-    .video-layer {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      top: 0;
-      left: 0;
-      object-fit: cover;
-    }
-    .videoB {
-      z-index: 1;
-      clip-path: inset(0 66.66% 0 0);
-    }
-    .videoC {
-      z-index: 2;
-      clip-path: inset(0 0 0 33.33%);
-    }
-    .divider {
-      position: absolute;
-      top: 0;
-      width: 2px;
-      height: 100%;
-      background: black;
-      z-index: 3;
-      pointer-events: auto;
-      touch-action: none;
-    }
-    .divider1 { left: 33.33%; }
-    .divider2 { left: 66.66%; }
-  </style>
+<style>
+  .video-compare-container {
+    margin-bottom: 2rem;
+  }
+
+  .video-wrapper-triple {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    background: #000;
+  }
+
+  .video-compare-container.triple .video-layer.videoA,
+  .video-compare-container.triple .video-layer.videoB,
+  .video-compare-container.triple .video-layer.videoC,
+  .video-layer {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    object-fit: cover;
+  }
+
+  .videoB {
+    z-index: 1;
+    clip-path: inset(0 66.66% 0 0);
+  }
+
+  .videoC {
+    z-index: 2;
+    clip-path: inset(0 0 0 33.33%);
+  }
+
+  .divider {
+    position: absolute;
+    top: 0;
+    width: 2px;
+    height: 100%;
+    background: black;
+    z-index: 3;
+    pointer-events: auto;
+    touch-action: none;
+  }
+
+  .divider1 { left: 33.33%; }
+  .divider2 { left: 66.66%; }
+</style>
+  
 </head>
 <body>
 
