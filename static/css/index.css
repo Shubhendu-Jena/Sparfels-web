@@ -159,16 +159,33 @@ body {
   z-index: 1;
 }
 
+/* --- Divider Styling --- */
 .divider {
   position: absolute;
   top: 0;
-  width: 2px;
+  width: 16px;              /* Wider hitbox for touch */
   height: 100%;
-  background-color: white;
+  background-color: transparent;
   z-index: 3;
   cursor: ew-resize;
   pointer-events: auto;
+  touch-action: none;
+  transform: translateX(-50%); /* Center on position */
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
+
+/* Add double arrow style */
+.divider::after {
+  content: '⇆';
+  color: white;
+  font-size: 20px;
+  font-weight: bold;
+  pointer-events: none;
+  user-select: none;
+}
+
 
 .video-wrapper-triple {
   position: relative;
