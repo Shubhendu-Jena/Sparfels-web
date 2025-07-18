@@ -175,7 +175,7 @@ body {
   position: relative;
   width: 100%;
   aspect-ratio: 16/9;
-  overflow: hidden;
+  overflow: visible;  /* ✅ Changed from hidden */
   background: #000;
   cursor: default;
 }
