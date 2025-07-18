@@ -419,7 +419,6 @@
       const divider1 = wrapper.querySelector('.divider1');
       const divider2 = wrapper.querySelector('.divider2');
   
-      // Lazy load
       [videoA, videoB, videoC].forEach(v => {
         if (!v.src && v.dataset.src) {
           v.src = v.dataset.src;
@@ -427,31 +426,38 @@
         }
       });
   
-      // Sync videos after all ready
+      // Exact frame lock: wait until all can play
       let ready = 0;
-      const onReady = () => {
+      const onCanPlay = () => {
         if (++ready < 3) return;
   
-        const startTime = Math.min(videoA.currentTime, videoB.currentTime, videoC.currentTime);
+        // Hard reset and pause first
         [videoA, videoB, videoC].forEach(v => {
-          v.currentTime = startTime;
-          v.play().catch(() => {});
+          v.pause();
+          v.currentTime = 0;
         });
   
-        const sync = () => {
-          const t = videoA.currentTime;
-          if (Math.abs(videoB.currentTime - t) > 0.05) videoB.currentTime = t;
-          if (Math.abs(videoC.currentTime - t) > 0.05) videoC.currentTime = t;
-          requestAnimationFrame(sync);
-        };
-        sync();
+        // Wait 2 frames then play in sync
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            [videoA, videoB, videoC].forEach(v => v.play().catch(() => {}));
+  
+            const sync = () => {
+              const t = videoA.currentTime;
+              if (Math.abs(videoB.currentTime - t) > 0.02) videoB.currentTime = t;
+              if (Math.abs(videoC.currentTime - t) > 0.02) videoC.currentTime = t;
+              requestAnimationFrame(sync);
+            };
+            sync();
+          });
+        });
       };
   
       [videoA, videoB, videoC].forEach(v => {
-        v.addEventListener('canplay', onReady, { once: true });
+        v.addEventListener('canplaythrough', onCanPlay, { once: true });
       });
   
-      // Divider drag
+      // === Divider Logic ===
       let dragging = null;
   
       const updateClips = (l, r) => {
@@ -470,25 +476,27 @@
   
       const stopDrag = () => dragging = null;
   
-      const handleMove = e => {
-        if (dragging === null) return;
+      const moveDrag = e => {
+        if (!dragging) return;
         const rect = wrapper.getBoundingClientRect();
         let x = ((e.clientX - rect.left) / rect.width) * 100;
         x = Math.max(0, Math.min(100, x));
         const l = parseFloat(divider1.style.left || '33.33');
         const r = parseFloat(divider2.style.left || '66.66');
+  
         if (dragging === 1 && x < r) updateClips(x, r);
         if (dragging === 2 && x > l) updateClips(l, x);
       };
   
       divider1.addEventListener('pointerdown', startDrag(1));
       divider2.addEventListener('pointerdown', startDrag(2));
+      wrapper.addEventListener('pointermove', moveDrag);
       wrapper.addEventListener('pointerup', stopDrag);
       wrapper.addEventListener('pointercancel', stopDrag);
-      wrapper.addEventListener('pointermove', handleMove);
     });
   });
   </script>
+
 
 
 
