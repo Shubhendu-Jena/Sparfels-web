@@ -110,11 +110,29 @@ function setupTripleViewer(containerId, videoPaths) {
 
 // Example calls (you can add more here)
 window.addEventListener('DOMContentLoaded', () => {
-  setupTripleViewer('dtu-scan-24', [
+  setupTripleViewer('dtu_scan24', [
     'static/videos/scan_dtu_24_sparfels.webm',
     'static/videos/scan_dtu_24_instantsplat.webm',
     'static/videos/scan_dtu_24_sparsecraft.webm'
   ]);
 
+  setupTripleViewer('dtu_scan65', [
+    'static/videos/scan_dtu_65_sparfels.webm',
+    'static/videos/scan_dtu_65_instantsplat.webm',
+    'static/videos/scan_dtu_65_sparsecraft.webm'
+  ]);
+
+  setupTripleViewer('bmvs_scan120', [
+    'static/videos/scan_bmvs_120_sparfels.webm',
+    'static/videos/scan_bmvs_120_uforecon.webm',
+    'static/videos/scan_bmvs_120_colmap.webm'
+  ]);
+
+  setupTripleViewer('bmvs_scan350', [
+    'static/videos/scan_bmvs_350_sparfels.webm',
+    'static/videos/scan_bmvs_350_uforecon.webm',
+    'static/videos/scan_bmvs_350_colmap.webm'
+  ]);
+});
   // Add additional calls for other containers with their respective video paths
 });
