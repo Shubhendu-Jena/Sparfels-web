@@ -1,4 +1,3 @@
-
 import * as THREE from 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r152/three.module.min.js';
 
 function setupTripleViewer(containerId, videoPaths) {
@@ -8,6 +7,7 @@ function setupTripleViewer(containerId, videoPaths) {
 
   const renderer = new THREE.WebGLRenderer({ antialias: true });
   renderer.setSize(width, height);
+  renderer.setScissorTest(true);
   container.appendChild(renderer.domElement);
 
   const scene = new THREE.Scene();
@@ -36,103 +36,104 @@ function setupTripleViewer(containerId, videoPaths) {
     return mesh;
   });
 
+  // Divider setup
   const divider1 = document.createElement('div');
   const divider2 = document.createElement('div');
-  divider1.className = 'divider';
-  divider2.className = 'divider';
-  container.appendChild(divider1);
-  container.appendChild(divider2);
+  [divider1, divider2].forEach(div => {
+    div.className = 'divider';
+    div.innerHTML = '<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:black;">↔</div>';
+    container.appendChild(div);
+  });
 
   let dividerX1 = width / 3;
   let dividerX2 = 2 * width / 3;
-  divider1.style.left = dividerX1 + 'px';
-  divider2.style.left = dividerX2 + 'px';
+  divider1.style.left = `${dividerX1}px`;
+  divider2.style.left = `${dividerX2}px`;
 
-  [divider1, divider2].forEach(div => {
-    div.style.width = '4px';
-    div.style.position = 'absolute';
-    div.style.top = '0';
-    div.style.height = '100%';
-    div.style.background = 'black';
-    div.style.cursor = 'ew-resize';
-    div.style.zIndex = 10;
-    div.innerHTML = '<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:black;">↔</div>';
-  });
-
+  // Drag logic
   let dragging = null;
-  const dragStart = (id) => () => { dragging = id; };
-  const dragEnd = () => { dragging = null; };
-  const dragMove = (e) => {
+  divider1.addEventListener('pointerdown', () => dragging = 1);
+  divider2.addEventListener('pointerdown', () => dragging = 2);
+  window.addEventListener('pointerup', () => dragging = null);
+  window.addEventListener('pointermove', e => {
     if (!dragging) return;
-    const x = Math.min(Math.max(e.clientX, 0), width);
+    const x = Math.min(Math.max(e.clientX - container.getBoundingClientRect().left, 0), width);
     if (dragging === 1) {
       dividerX1 = Math.min(x, dividerX2 - 10);
-      divider1.style.left = dividerX1 + 'px';
+      divider1.style.left = `${dividerX1}px`;
     } else if (dragging === 2) {
       dividerX2 = Math.max(x, dividerX1 + 10);
-      divider2.style.left = dividerX2 + 'px';
+      divider2.style.left = `${dividerX2}px`;
     }
-  };
-  divider1.addEventListener('pointerdown', dragStart(1));
-  divider2.addEventListener('pointerdown', dragStart(2));
-  window.addEventListener('pointerup', dragEnd);
-  window.addEventListener('pointermove', dragMove);
+  });
 
+  // Resize handling
+  window.addEventListener('resize', () => {
+    const newWidth = container.clientWidth;
+    const newHeight = container.clientHeight;
+    renderer.setSize(newWidth, newHeight);
+    camera.right = newWidth;
+    camera.top = newHeight;
+    camera.updateProjectionMatrix();
+  });
+
+  // Animation loop
   function animate() {
     requestAnimationFrame(animate);
-    renderer.setScissorTest(true);
-    renderer.clear();
-
+    const w = container.clientWidth;
+    const h = container.clientHeight;
     const x1 = dividerX1;
     const x2 = dividerX2;
 
-    renderer.setScissor(0, 0, x1, height);
-    renderer.setViewport(0, 0, x1, height);
+    renderer.setScissor(0, 0, x1, h);
+    renderer.setViewport(0, 0, x1, h);
     renderer.render(scene, camera);
 
-    renderer.setScissor(x1, 0, x2 - x1, height);
-    renderer.setViewport(x1, 0, x2 - x1, height);
+    renderer.setScissor(x1, 0, x2 - x1, h);
+    renderer.setViewport(x1, 0, x2 - x1, h);
     renderer.render(scene, camera);
 
-    renderer.setScissor(x2, 0, width - x2, height);
-    renderer.setViewport(x2, 0, width - x2, height);
+    renderer.setScissor(x2, 0, w - x2, h);
+    renderer.setViewport(x2, 0, w - x2, h);
     renderer.render(scene, camera);
   }
 
-  videos.forEach(v => v.addEventListener('canplaythrough', () => {
-    if (videos.every(video => video.readyState >= 3)) {
-      videos.forEach(v => v.play());
-    }
-  }));
-
-  animate();
+  // Play when all videos are ready
+  let readyCount = 0;
+  videos.forEach(v => {
+    v.addEventListener('canplaythrough', () => {
+      readyCount++;
+      if (readyCount === 3) {
+        videos.forEach(v => {
+          v.currentTime = 0;
+          v.play().catch(() => {});
+        });
+        animate();
+      }
+    });
+  });
 }
 
-// Example calls (you can add more here)
+// Initialize all viewers
 window.addEventListener('DOMContentLoaded', () => {
   setupTripleViewer('dtu_scan24', [
     'static/videos/scan_dtu_24_sparfels.webm',
     'static/videos/scan_dtu_24_instantsplat.webm',
     'static/videos/scan_dtu_24_sparsecraft.webm'
   ]);
-
   setupTripleViewer('dtu_scan65', [
     'static/videos/scan_dtu_65_sparfels.webm',
     'static/videos/scan_dtu_65_instantsplat.webm',
     'static/videos/scan_dtu_65_sparsecraft.webm'
   ]);
-
   setupTripleViewer('bmvs_scan120', [
     'static/videos/scan_bmvs_120_sparfels.webm',
     'static/videos/scan_bmvs_120_uforecon.webm',
     'static/videos/scan_bmvs_120_colmap.webm'
   ]);
-
   setupTripleViewer('bmvs_scan350', [
     'static/videos/scan_bmvs_350_sparfels.webm',
     'static/videos/scan_bmvs_350_uforecon.webm',
     'static/videos/scan_bmvs_350_colmap.webm'
   ]);
-});
-  // Add additional calls for other containers with their respective video paths
 });
