@@ -10,21 +10,19 @@
   <link rel="stylesheet" href="static/css/index.css">
 
 <style>
+  
   .video-compare-container {
     margin-bottom: 2rem;
   }
-
-  .video-wrapper-triple {
+  
+  .video-wrapper-double {
     position: relative;
     width: 100%;
     aspect-ratio: 16 / 9;
     overflow: hidden;
     background: #000;
   }
-
-  .video-compare-container.triple .video-layer.videoA,
-  .video-compare-container.triple .video-layer.videoB,
-  .video-compare-container.triple .video-layer.videoC,
+  
   .video-layer {
     position: absolute;
     top: 0; left: 0;
@@ -32,17 +30,12 @@
     object-fit: contain;
     background-color: black;
   }
-
-  .videoB {
+  
+  .video-layer.videoB {
     z-index: 1;
-    clip-path: inset(0 66.66% 0 0);
+    clip-path: inset(0 50% 0 0);
   }
-
-  .videoC {
-    z-index: 2;
-    clip-path: inset(0 0 0 33.33%);
-  }
-
+  
   /* --- Divider Styling --- */
   .divider {
     position: absolute;
@@ -56,7 +49,6 @@
     touch-action: none;
   }
   
-  /* Add a clean black double arrow in the middle */
   .divider::after {
     content: '↔';
     position: absolute;
@@ -68,6 +60,7 @@
     user-select: none;
     pointer-events: none;
   }
+
 
 
   .divider1 { left: 33.33%; }
