@@ -1,24 +1,15 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Sparfels - Project Page</title>
-
-  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro" rel="stylesheet">
-  <link rel="stylesheet" href="static/css/bulma.min.css">
-  <link rel="stylesheet" href="static/css/index.css">
-
+  <title>WebGL Video Comparison</title>
   <style>
-    .webgl-triple-container {
-      width: 100%;
-      max-width: 100%;
-      margin-bottom: 2rem;
+    body { margin: 0; background: #000; }
+    .webgl-container {
+      width: 100vw;
+      height: 100vh;
       position: relative;
-      aspect-ratio: 4 / 3;
     }
-
     .divider {
       position: absolute;
       top: 0;
@@ -28,7 +19,6 @@
       z-index: 10;
       cursor: ew-resize;
     }
-
     .divider::after {
       content: '↔';
       position: absolute;
@@ -39,74 +29,113 @@
       font-size: 18px;
     }
   </style>
-
-  <script type="module" src="static/js/setup-webgl-viewers.js"></script>
 </head>
 <body>
+<div class="webgl-container" id="viewer"></div>
 
-<section class="hero">
-  <div class="hero-body">
-    <div class="container is-max-desktop">
-      <div class="columns is-centered">
-        <div class="column has-text-centered">
-          <h1 class="title is-1 publication-title">Sparfels: Fast Reconstruction from Sparse Unposed Imagery</h1>
-          <div class="is-size-3 publication-authors">
-            <span class="author-block"><a href="#">Shubhendu Jena<sup>†</sup></a>,</span>
-            <span class="author-block"><a href="#">Amine Ouasfi<sup>†</sup></a>,</span>
-            <span class="author-block"><a href="#">Mae Younes</a>,</span>
-            <span class="author-block"><a href="#">Adnane Boukhayma</a></span>
-          </div>
-          <div class="is-size-6" style="margin-top: 0.5em;">
-            <sup>†</sup>Equal contribution
-          </div>
-          <div class="is-size-3 publication-authors">
-            <img src="./static/inria_logo.png" alt="INRIA Logo" style="max-height: 1.2em;"><br><b>ICCV 2025</b>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r152/three.min.js"></script>
+<script>
+  const container = document.getElementById("viewer");
+  const width = container.clientWidth;
+  const height = container.clientHeight;
 
-<section class="section">
-  <div class="container is-max-desktop">
-    <h2 class="title is-3 has-text-centered">Interactive Comparisons</h2>
+  const renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setSize(width, height);
+  renderer.setScissorTest(true);
+  container.appendChild(renderer.domElement);
 
-    <h3 class="title is-5 has-text-centered">DTU</h3>
-    <div id="dtu_scan24" class="webgl-triple-container"></div>
-    <div id="dtu_scan65" class="webgl-triple-container"></div>
+  const scene = new THREE.Scene();
+  const camera = new THREE.OrthographicCamera(0, width, height, 0, -1, 1);
 
-    <h3 class="title is-5 has-text-centered">BlendedMVS</h3>
-    <div id="bmvs_scan120" class="webgl-triple-container" style="aspect-ratio: 370 / 281;"></div>
-    <div id="bmvs_scan350" class="webgl-triple-container" style="aspect-ratio: 382 / 287;"></div>
-  </div>
-</section>
+  const paths = [
+    'static/videos/scan_dtu_24_sparfels.webm',
+    'static/videos/scan_dtu_24_instantsplat.webm',
+    'static/videos/scan_dtu_24_sparsecraft.webm'
+  ];
 
-<section class="section" id="BibTeX">
-  <div class="container is-max-desktop content">
-    <h2 class="title">BibTeX</h2>
-    <pre><code>@article{jena2025sparfels,
-  title={Sparfels: Fast Reconstruction from Sparse Unposed Imagery},
-  author={Jena, Shubhendu and Ouasfi, Amine and Younes, Mae and Boukhayma, Adnane},
-  journal={arXiv preprint arXiv:},
-  year={2025}
-}</code></pre>
-  </div>
-</section>
+  const videos = paths.map(src => {
+    const v = document.createElement('video');
+    v.src = src;
+    v.crossOrigin = 'anonymous';
+    v.muted = true;
+    v.loop = true;
+    v.playsInline = true;
+    v.preload = 'auto';
+    return v;
+  });
 
-<footer class="footer">
-  <div class="container">
-    <div class="columns is-centered">
-      <div class="column is-8">
-        <div class="content">
-          <p>
-            This page was built using the <a href="https://github.com/eliahuhorwitz/Academic-project-page-template" target="_blank">Academic Project Page Template</a>.
-            <br>This website is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/" target="_blank">Creative Commons Attribution-ShareAlike 4.0 International License</a>.
-          </p>
-        </div>
-      </div>
-    </div>
-  </div>
-</footer>
+  let divider1 = document.createElement('div');
+  let divider2 = document.createElement('div');
+  divider1.className = 'divider';
+  divider2.className = 'divider';
+  container.appendChild(divider1);
+  container.appendChild(divider2);
+  let dividerX1 = width / 3;
+  let dividerX2 = 2 * width / 3;
+  divider1.style.left = dividerX1 + 'px';
+  divider2.style.left = dividerX2 + 'px';
+
+  let dragging = null;
+  divider1.addEventListener('pointerdown', () => dragging = 1);
+  divider2.addEventListener('pointerdown', () => dragging = 2);
+  window.addEventListener('pointerup', () => dragging = null);
+  window.addEventListener('pointermove', e => {
+    if (!dragging) return;
+    const x = e.clientX;
+    if (dragging === 1) {
+      dividerX1 = Math.min(x, dividerX2 - 10);
+      divider1.style.left = `${dividerX1}px`;
+    } else {
+      dividerX2 = Math.max(x, dividerX1 + 10);
+      divider2.style.left = `${dividerX2}px`;
+    }
+  });
+
+  let readyCount = 0;
+  videos.forEach(v => {
+    v.addEventListener('canplaythrough', () => {
+      readyCount++;
+      if (readyCount === 3) {
+        videos.forEach(v => {
+          v.currentTime = 0;
+          v.play().catch(() => {});
+        });
+
+        const textures = videos.map(v => new THREE.VideoTexture(v));
+        const planes = textures.map((tex, i) => {
+          const mat = new THREE.MeshBasicMaterial({ map: tex });
+          const geo = new THREE.PlaneGeometry(width, height);
+          const mesh = new THREE.Mesh(geo, mat);
+          mesh.position.z = -i;
+          scene.add(mesh);
+          return mesh;
+        });
+
+        function animate() {
+          requestAnimationFrame(animate);
+          const w = container.clientWidth;
+          const h = container.clientHeight;
+          const x1 = dividerX1;
+          const x2 = dividerX2;
+
+          renderer.setScissor(0, 0, x1, h);
+          renderer.setViewport(0, 0, x1, h);
+          renderer.render(scene, camera);
+
+          renderer.setScissor(x1, 0, x2 - x1, h);
+          renderer.setViewport(x1, 0, x2 - x1, h);
+          renderer.render(scene, camera);
+
+          renderer.setScissor(x2, 0, w - x2, h);
+          renderer.setViewport(x2, 0, w - x2, h);
+          renderer.render(scene, camera);
+        }
+
+        animate();
+      }
+    });
+    v.load();  // Load manually
+  });
+</script>
 </body>
 </html>
