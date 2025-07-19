@@ -5,10 +5,11 @@
   <title>WebGL Video Comparison</title>
   <style>
     body { margin: 0; background: #000; }
-    .webgl-container {
+    #viewer {
       width: 100vw;
       height: 100vh;
       position: relative;
+      overflow: hidden;
     }
     .divider {
       position: absolute;
@@ -31,8 +32,9 @@
   </style>
 </head>
 <body>
-<div class="webgl-container" id="viewer"></div>
+<div id="viewer"></div>
 
+<!-- ✅ Global script instead of ES module -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r152/three.min.js"></script>
 <script>
   const container = document.getElementById("viewer");
@@ -47,29 +49,32 @@
   const scene = new THREE.Scene();
   const camera = new THREE.OrthographicCamera(0, width, height, 0, -1, 1);
 
-  const paths = [
+  const videoPaths = [
     'static/videos/scan_dtu_24_sparfels.webm',
     'static/videos/scan_dtu_24_instantsplat.webm',
     'static/videos/scan_dtu_24_sparsecraft.webm'
   ];
 
-  const videos = paths.map(src => {
+  const videos = videoPaths.map(src => {
     const v = document.createElement('video');
     v.src = src;
-    v.crossOrigin = 'anonymous';
     v.muted = true;
     v.loop = true;
     v.playsInline = true;
+    v.crossOrigin = 'anonymous';
     v.preload = 'auto';
+    v.load(); // force start load
     return v;
   });
 
-  let divider1 = document.createElement('div');
-  let divider2 = document.createElement('div');
+  // Add dividers
+  const divider1 = document.createElement('div');
+  const divider2 = document.createElement('div');
   divider1.className = 'divider';
   divider2.className = 'divider';
   container.appendChild(divider1);
   container.appendChild(divider2);
+
   let dividerX1 = width / 3;
   let dividerX2 = 2 * width / 3;
   divider1.style.left = dividerX1 + 'px';
@@ -81,7 +86,7 @@
   window.addEventListener('pointerup', () => dragging = null);
   window.addEventListener('pointermove', e => {
     if (!dragging) return;
-    const x = e.clientX;
+    const x = e.clientX - container.getBoundingClientRect().left;
     if (dragging === 1) {
       dividerX1 = Math.min(x, dividerX2 - 10);
       divider1.style.left = `${dividerX1}px`;
@@ -95,12 +100,7 @@
   videos.forEach(v => {
     v.addEventListener('canplaythrough', () => {
       readyCount++;
-      if (readyCount === 3) {
-        videos.forEach(v => {
-          v.currentTime = 0;
-          v.play().catch(() => {});
-        });
-
+      if (readyCount === videos.length) {
         const textures = videos.map(v => new THREE.VideoTexture(v));
         const planes = textures.map((tex, i) => {
           const mat = new THREE.MeshBasicMaterial({ map: tex });
@@ -111,30 +111,32 @@
           return mesh;
         });
 
+        videos.forEach(v => {
+          v.currentTime = 0;
+          v.play().catch(err => console.error("Autoplay failed", err));
+        });
+
         function animate() {
           requestAnimationFrame(animate);
           const w = container.clientWidth;
           const h = container.clientHeight;
-          const x1 = dividerX1;
-          const x2 = dividerX2;
 
-          renderer.setScissor(0, 0, x1, h);
-          renderer.setViewport(0, 0, x1, h);
+          renderer.setScissor(0, 0, dividerX1, h);
+          renderer.setViewport(0, 0, dividerX1, h);
           renderer.render(scene, camera);
 
-          renderer.setScissor(x1, 0, x2 - x1, h);
-          renderer.setViewport(x1, 0, x2 - x1, h);
+          renderer.setScissor(dividerX1, 0, dividerX2 - dividerX1, h);
+          renderer.setViewport(dividerX1, 0, dividerX2 - dividerX1, h);
           renderer.render(scene, camera);
 
-          renderer.setScissor(x2, 0, w - x2, h);
-          renderer.setViewport(x2, 0, w - x2, h);
+          renderer.setScissor(dividerX2, 0, w - dividerX2, h);
+          renderer.setViewport(dividerX2, 0, w - dividerX2, h);
           renderer.render(scene, camera);
         }
 
         animate();
       }
     });
-    v.load();  // Load manually
   });
 </script>
 </body>
