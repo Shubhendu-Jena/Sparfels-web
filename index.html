@@ -449,105 +449,80 @@
     <!-- End of Statcounter Code -->
 
   <script>
-  function syncTripleVideos(videoA, videoB, videoC) {
-    function step() {
-      const t = videoA.currentTime;
-      if (Math.abs(videoB.currentTime - t) > 0.01) videoB.currentTime = t;
-      if (Math.abs(videoC.currentTime - t) > 0.01) videoC.currentTime = t;
-      videoA.requestVideoFrameCallback(step);
-    }
-    videoA.requestVideoFrameCallback(step);
-  }
-  </script>
-
-
-  <script>
   document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('[data-videoset]').forEach(set => {
-      const wrapper = set.querySelector('.video-wrapper-triple');
-      const [videoA, videoB, videoC] = [
-        wrapper.querySelector('.videoA'),
-        wrapper.querySelector('.videoB'),
-        wrapper.querySelector('.videoC')
-      ];
-      const [divider1, divider2] = [
-        wrapper.querySelector('.divider1'),
-        wrapper.querySelector('.divider2')
-      ];
+      const wrapper = set.querySelector('.video-wrapper-double');
+      const videoA = wrapper.querySelector('.videoA');
+      const videoB = wrapper.querySelector('.videoB');
+      const divider = wrapper.querySelector('.divider');
   
       // Lazy load
-      [videoA, videoB, videoC].forEach(v => {
+      [videoA, videoB].forEach(v => {
         if (!v.src && v.dataset.src) {
           v.src = v.dataset.src;
           v.load();
         }
       });
   
-      // Wait for all to be ready
+      // Wait for both to be ready
       let loaded = 0;
       const checkReady = () => {
         loaded++;
-        if (loaded === 3) {
-          [videoA, videoB, videoC].forEach(v => {
+        if (loaded === 2) {
+          [videoA, videoB].forEach(v => {
             v.pause();
             v.currentTime = 0;
           });
           requestAnimationFrame(() => {
             requestAnimationFrame(() => {
-              [videoA, videoB, videoC].forEach(v => v.play().catch(() => {}));
-              syncTripleVideos(videoA, videoB, videoC);  // <== Call it here
+              [videoA, videoB].forEach(v => v.play().catch(() => {}));
+              syncVideos(videoA, videoB);
             });
           });
         }
       };
-
   
-      [videoA, videoB, videoC].forEach(v => {
+      [videoA, videoB].forEach(v => {
         v.addEventListener('canplaythrough', checkReady, { once: true });
       });
   
-      // Sync correction loop
-      function syncLoop() {
-        const t = videoA.currentTime;
-        if (Math.abs(videoB.currentTime - t) > 0.02) videoB.currentTime = t;
-        if (Math.abs(videoC.currentTime - t) > 0.02) videoC.currentTime = t;
-        requestAnimationFrame(syncLoop);
+      // Sync loop
+      function syncVideos(a, b) {
+        function step() {
+          const t = a.currentTime;
+          if (Math.abs(b.currentTime - t) > 0.02) b.currentTime = t;
+          a.requestVideoFrameCallback(step);
+        }
+        a.requestVideoFrameCallback(step);
       }
   
       // Divider drag
-      let dragging = null;
-      function updateClips(l, r) {
-        videoB.style.clipPath = `inset(0 ${100 - l}% 0 0)`;
-        videoC.style.clipPath = `inset(0 0 0 ${r}%)`;
-        divider1.style.left = `${l}%`;
-        divider2.style.left = `${r}%`;
+      let dragging = false;
+      function updateClip(percent) {
+        videoB.style.clipPath = `inset(0 ${100 - percent}% 0 0)`;
+        divider.style.left = `${percent}%`;
       }
-      updateClips(33.33, 66.66);
+      updateClip(50);
   
-      const startDrag = id => e => {
-        dragging = id;
+      divider.addEventListener('pointerdown', e => {
+        dragging = true;
         wrapper.setPointerCapture(e.pointerId);
-      };
-      const stopDrag = () => dragging = null;
-      const moveDrag = e => {
+      });
+  
+      wrapper.addEventListener('pointermove', e => {
         if (!dragging) return;
         const rect = wrapper.getBoundingClientRect();
         const percent = ((e.clientX - rect.left) / rect.width) * 100;
         const clamped = Math.min(Math.max(percent, 0), 100);
-        const l = parseFloat(divider1.style.left || '33.33');
-        const r = parseFloat(divider2.style.left || '66.66');
-        if (dragging === 1 && clamped < r) updateClips(clamped, r);
-        if (dragging === 2 && clamped > l) updateClips(l, clamped);
-      };
+        updateClip(clamped);
+      });
   
-      divider1.addEventListener('pointerdown', startDrag(1));
-      divider2.addEventListener('pointerdown', startDrag(2));
-      wrapper.addEventListener('pointermove', moveDrag);
-      wrapper.addEventListener('pointerup', stopDrag);
-      wrapper.addEventListener('pointercancel', stopDrag);
+      wrapper.addEventListener('pointerup', () => dragging = false);
+      wrapper.addEventListener('pointercancel', () => dragging = false);
     });
   });
   </script>
+
 
 
 
