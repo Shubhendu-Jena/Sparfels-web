@@ -17,12 +17,17 @@ function setupTripleViewer(containerId, videoPaths) {
     const v = document.createElement('video');
     v.src = path;
     v.muted = true;
+    v.autoplay = true;
     v.loop = true;
     v.playsInline = true;
     v.preload = 'auto';
     v.crossOrigin = 'anonymous';
+  
+    // Force load immediately
+    v.load();
     return v;
   });
+
 
   const textures = videos.map(v => new THREE.VideoTexture(v));
   const planes = textures.map((tex, i) => {
@@ -103,10 +108,15 @@ function setupTripleViewer(containerId, videoPaths) {
   videos.forEach(v => {
     v.addEventListener('canplaythrough', () => {
       readyCount++;
-      if (readyCount === 3) {
+      if (readyCount === videos.length) {
         videos.forEach(v => {
           v.currentTime = 0;
-          v.play().catch(() => {});
+          const playPromise = v.play();
+          if (playPromise !== undefined) {
+            playPromise.catch(err => {
+              console.error("Video play failed:", err);
+            });
+          }
         });
         animate();
       }
