@@ -157,7 +157,7 @@
 <section class="hero teaser">
   <div class="container is-max-desktop">
     <div class="hero-body">
-      <img src="./static/teaser.png" class="center"></img>
+      <img src="./static/teaser.png" loading="lazy" class="center"></img>
       <div class="content has-text-justified">
         <p>
           <b>Fast training of Sparfels.</b> Examples of reconstruction meshes obtained within <strong>3 minutes</strong> from sparse pose-free images via our method. We used here <strong>6 (left) and 3 (right) input images</strong> respectively from scenes of datasets MVImgNet and BMVS.
@@ -202,8 +202,8 @@
       <div class="column is-half" data-videoset="dtu_scan24">
         <div class="video-compare-container double">
           <div class="video-wrapper-double" style="aspect-ratio: 4 / 3;">
-            <video class="video-layer videoA" muted playsinline preload="auto" decoding="async" loop data-src="static/videos/scan_dtu_24_sparfels.webm"></video>
-            <video class="video-layer videoB" muted playsinline preload="auto" decoding="async" loop data-src="static/videos/scan_dtu_24_instantsplat.webm"></video>
+            <video class="video-layer videoA" muted playsinline preload="metadata" decoding="async" loop data-src="static/videos/scan_dtu_24_sparfels.webm"></video>
+            <video class="video-layer videoB" muted playsinline preload="metadata" decoding="async" loop data-src="static/videos/scan_dtu_24_instantsplat.webm"></video>
             <div class="divider"></div>
           </div>
           <p class="has-text-centered"><small>Scan 24: InstantSplat vs. Sparfels</small></p>
@@ -214,8 +214,8 @@
       <div class="column is-half" data-videoset="dtu_scan65">
         <div class="video-compare-container double">
           <div class="video-wrapper-double" style="aspect-ratio: 4 / 3;">
-            <video class="video-layer videoA" muted playsinline preload="auto" decoding="async" loop data-src="static/videos/scan_dtu_65_sparfels.webm"></video>
-            <video class="video-layer videoB" muted playsinline preload="auto" decoding="async" loop data-src="static/videos/scan_dtu_65_sparsecraft.webm"></video>
+            <video class="video-layer videoA" muted playsinline preload="metadata" decoding="async" loop data-src="static/videos/scan_dtu_65_sparfels.webm"></video>
+            <video class="video-layer videoB" muted playsinline preload="metadata" decoding="async" loop data-src="static/videos/scan_dtu_65_sparsecraft.webm"></video>
             <div class="divider"></div>
           </div>
           <p class="has-text-centered"><small>Scan 65: SparseCraft vs. Sparfels</small></p>
@@ -231,8 +231,8 @@
       <div class="column is-half" data-videoset="bmvs_scan120">
         <div class="video-compare-container double">
           <div class="video-wrapper-double" style="aspect-ratio: 4 / 3;">
-            <video class="video-layer videoA" muted playsinline preload="auto" decoding="async" loop data-src="static/videos/scan_bmvs_120_sparfels.webm"></video>
-            <video class="video-layer videoB" muted playsinline preload="auto" decoding="async" loop data-src="static/videos/scan_bmvs_120_uforecon.webm"></video>
+            <video class="video-layer videoA" muted playsinline preload="metadata" decoding="async" loop data-src="static/videos/scan_bmvs_120_sparfels.webm"></video>
+            <video class="video-layer videoB" muted playsinline preload="metadata" decoding="async" loop data-src="static/videos/scan_bmvs_120_uforecon.webm"></video>
             <div class="divider"></div>
           </div>
           <p class="has-text-centered"><small>Scan 120: UfoRecon vs. Sparfels</small></p>
@@ -243,8 +243,8 @@
       <div class="column is-half" data-videoset="bmvs_scan350">
         <div class="video-compare-container double">
           <div class="video-wrapper-double" style="aspect-ratio: 4 / 3;">
-            <video class="video-layer videoA" muted playsinline preload="auto" decoding="async" loop data-src="static/videos/scan_bmvs_350_sparfels.webm"></video>
-            <video class="video-layer videoB" muted playsinline preload="auto" decoding="async" loop data-src="static/videos/scan_bmvs_350_colmap.webm"></video>
+            <video class="video-layer videoA" muted playsinline preload="metadata" decoding="async" loop data-src="static/videos/scan_bmvs_350_sparfels.webm"></video>
+            <video class="video-layer videoB" muted playsinline preload="metadata" decoding="async" loop data-src="static/videos/scan_bmvs_350_colmap.webm"></video>
             <div class="divider"></div>
           </div>
           <p class="has-text-centered"><small>Scan 350: Colmap vs. Sparfels</small></p>
@@ -271,19 +271,19 @@
     <div class="columns is-centered has-text-centered">
       <div class="column is-full-width">
         <h2 class="title is-3">Comparison Results</h2>
-        <img src="./static/dtu.png" class="center"></img>
+        <img src="./static/dtu.png" loading="lazy" class="center"></img>
         <div class="content has-text-justified">
           <p>
             Visual comparisons on the sparse reconstruction setting of DTU dataset.
           </p>
         </div>
-        <img src="./static/mvimg.png" class="center"></img>
+        <img src="./static/mvimg.png" loading="lazy" class="center"></img>
         <div class="content has-text-justified">
           <p>
             Visual comparison of surface reconstruction results on MVImgNet (first 5) and MipNeRF360 (last 2) datasets.
           </p>
         </div>
-        <img src="./static/bmvs.png" class="center"></img>
+        <img src="./static/bmvs.png" loading="lazy" class="center"></img>
         <div class="content has-text-justified">
           <p>
             Visual comparison of surface reconstruction results on BlendedMVS dataset.
@@ -457,27 +457,39 @@
         }
       });
   
-      // Wait for both to be ready
-      let loaded = 0;
-      const checkReady = () => {
-        loaded++;
-        if (loaded === 2) {
-          [videoA, videoB].forEach(v => {
-            v.pause();
-            v.currentTime = 0;
-          });
-          requestAnimationFrame(() => {
-            requestAnimationFrame(() => {
-              [videoA, videoB].forEach(v => v.play().catch(() => {}));
-              syncVideos(videoA, videoB);
-            });
-          });
+      // Wait for both to be ready and play in sync
+      let bothReady = 0;
+      const onReady = () => {
+        bothReady++;
+        if (bothReady === 2) {
+          videoA.currentTime = 0;
+          videoB.currentTime = 0;
+      
+          const syncPlay = () => {
+            videoA.play();
+            videoB.play();
+            syncLoop();
+          };
+      
+          setTimeout(syncPlay, 100); // slight buffer for safety
         }
       };
-  
-      [videoA, videoB].forEach(v => {
-        v.addEventListener('canplaythrough', checkReady, { once: true });
-      });
+      
+      const syncLoop = () => {
+        const a = videoA;
+        const b = videoB;
+        function step() {
+          if (Math.abs(a.currentTime - b.currentTime) > 0.015) {
+            b.currentTime = a.currentTime;
+          }
+          a.requestVideoFrameCallback(step);
+        }
+        a.requestVideoFrameCallback(step);
+      };
+      
+      videoA.addEventListener('canplaythrough', onReady, { once: true });
+      videoB.addEventListener('canplaythrough', onReady, { once: true });
+
   
       // Sync loop
       function syncVideos(a, b) {
