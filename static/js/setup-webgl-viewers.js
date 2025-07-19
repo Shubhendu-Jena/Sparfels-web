@@ -17,31 +17,14 @@ function setupTripleViewer(containerId, videoPaths) {
     const v = document.createElement('video');
     v.src = path;
     v.muted = true;
-    v.autoplay = true;
     v.loop = true;
     v.playsInline = true;
     v.preload = 'auto';
     v.crossOrigin = 'anonymous';
-  
-    // Force load immediately
-    v.load();
     return v;
   });
 
-
-  const textures = videos.map(v => new THREE.VideoTexture(v));
-  const planes = textures.map((tex, i) => {
-    tex.minFilter = THREE.LinearFilter;
-    tex.magFilter = THREE.LinearFilter;
-    const mat = new THREE.MeshBasicMaterial({ map: tex });
-    const geo = new THREE.PlaneGeometry(width, height);
-    const mesh = new THREE.Mesh(geo, mat);
-    mesh.position.z = -i;
-    scene.add(mesh);
-    return mesh;
-  });
-
-  // Divider setup
+  // Divider setup (do early so you see them even if video fails)
   const divider1 = document.createElement('div');
   const divider2 = document.createElement('div');
   [divider1, divider2].forEach(div => {
@@ -82,47 +65,57 @@ function setupTripleViewer(containerId, videoPaths) {
     camera.updateProjectionMatrix();
   });
 
-  // Animation loop
-  function animate() {
-    requestAnimationFrame(animate);
-    const w = container.clientWidth;
-    const h = container.clientHeight;
-    const x1 = dividerX1;
-    const x2 = dividerX2;
-
-    renderer.setScissor(0, 0, x1, h);
-    renderer.setViewport(0, 0, x1, h);
-    renderer.render(scene, camera);
-
-    renderer.setScissor(x1, 0, x2 - x1, h);
-    renderer.setViewport(x1, 0, x2 - x1, h);
-    renderer.render(scene, camera);
-
-    renderer.setScissor(x2, 0, w - x2, h);
-    renderer.setViewport(x2, 0, w - x2, h);
-    renderer.render(scene, camera);
-  }
-
-  // Play when all videos are ready
+  // Wait for all videos to be ready, then create textures
   let readyCount = 0;
   videos.forEach(v => {
     v.addEventListener('canplaythrough', () => {
       readyCount++;
       if (readyCount === videos.length) {
         videos.forEach(v => {
+          v.load();
           v.currentTime = 0;
-          const playPromise = v.play();
-          if (playPromise !== undefined) {
-            playPromise.catch(err => {
-              console.error("Video play failed:", err);
-            });
-          }
+          v.play().catch(() => {});
         });
+
+        const textures = videos.map(v => new THREE.VideoTexture(v));
+        const planes = textures.map((tex, i) => {
+          tex.minFilter = THREE.LinearFilter;
+          tex.magFilter = THREE.LinearFilter;
+          const mat = new THREE.MeshBasicMaterial({ map: tex });
+          const geo = new THREE.PlaneGeometry(width, height);
+          const mesh = new THREE.Mesh(geo, mat);
+          mesh.position.z = -i;
+          scene.add(mesh);
+          return mesh;
+        });
+
+        // Animation loop
+        function animate() {
+          requestAnimationFrame(animate);
+          const w = container.clientWidth;
+          const h = container.clientHeight;
+          const x1 = dividerX1;
+          const x2 = dividerX2;
+
+          renderer.setScissor(0, 0, x1, h);
+          renderer.setViewport(0, 0, x1, h);
+          renderer.render(scene, camera);
+
+          renderer.setScissor(x1, 0, x2 - x1, h);
+          renderer.setViewport(x1, 0, x2 - x1, h);
+          renderer.render(scene, camera);
+
+          renderer.setScissor(x2, 0, w - x2, h);
+          renderer.setViewport(x2, 0, w - x2, h);
+          renderer.render(scene, camera);
+        }
+
         animate();
       }
     });
   });
 }
+
 
 // Initialize all viewers
 window.addEventListener('DOMContentLoaded', () => {
