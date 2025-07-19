@@ -457,38 +457,37 @@
         }
       });
   
-      // Wait for both to be ready and play in sync
       let bothReady = 0;
       const onReady = () => {
         bothReady++;
         if (bothReady === 2) {
+          videoA.pause();
+          videoB.pause();
           videoA.currentTime = 0;
           videoB.currentTime = 0;
       
-          const syncPlay = () => {
-            videoA.play();
-            videoB.play();
-            syncLoop();
-          };
-      
-          setTimeout(syncPlay, 100); // slight buffer for safety
+          setTimeout(() => {
+            Promise.all([videoA.play(), videoB.play()]).then(() => {
+              syncLoop();
+            });
+          }, 100); // wait a bit to avoid frame skip
         }
       };
       
       const syncLoop = () => {
-        const a = videoA;
-        const b = videoB;
         function step() {
-          if (Math.abs(a.currentTime - b.currentTime) > 0.015) {
-            b.currentTime = a.currentTime;
+          const diff = Math.abs(videoA.currentTime - videoB.currentTime);
+          if (diff > 0.01) {
+            videoB.currentTime = videoA.currentTime;
           }
-          a.requestVideoFrameCallback(step);
+          videoA.requestVideoFrameCallback(step);
         }
-        a.requestVideoFrameCallback(step);
+        videoA.requestVideoFrameCallback(step);
       };
       
       videoA.addEventListener('canplaythrough', onReady, { once: true });
       videoB.addEventListener('canplaythrough', onReady, { once: true });
+
 
   
       // Sync loop
