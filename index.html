@@ -2,14 +2,18 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>WebGL Video Comparison</title>
+  <title>WebGL Triple Video Viewer</title>
   <style>
-    body { margin: 0; background: #000; }
-    #viewer {
+    body, html {
+      margin: 0;
+      padding: 0;
+      background: black;
+      height: 100%;
+    }
+    .webgl-container {
+      position: relative;
       width: 100vw;
       height: 100vh;
-      position: relative;
-      overflow: hidden;
     }
     .divider {
       position: absolute;
@@ -23,18 +27,17 @@
     .divider::after {
       content: '↔';
       position: absolute;
-      color: black;
-      left: 50%;
       top: 50%;
+      left: 50%;
       transform: translate(-50%, -50%);
+      color: white;
       font-size: 18px;
     }
   </style>
 </head>
 <body>
-<div id="viewer"></div>
+<div class="webgl-container" id="viewer"></div>
 
-<!-- ✅ Global script instead of ES module -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r152/three.min.js"></script>
 <script>
   const container = document.getElementById("viewer");
@@ -49,44 +52,43 @@
   const scene = new THREE.Scene();
   const camera = new THREE.OrthographicCamera(0, width, height, 0, -1, 1);
 
-  const videoPaths = [
-    'static/videos/scan_dtu_24_sparfels.webm',
-    'static/videos/scan_dtu_24_instantsplat.webm',
-    'static/videos/scan_dtu_24_sparsecraft.webm'
+  const paths = [
+    "static/videos/scan_dtu_24_sparfels.webm",
+    "static/videos/scan_dtu_24_instantsplat.webm",
+    "static/videos/scan_dtu_24_sparsecraft.webm"
   ];
 
-  const videos = videoPaths.map(src => {
-    const v = document.createElement('video');
-    v.src = src;
-    v.muted = true;
+  const videos = paths.map(path => {
+    const v = document.createElement("video");
+    v.src = path;
+    v.crossOrigin = "anonymous";
     v.loop = true;
+    v.muted = true;
     v.playsInline = true;
-    v.crossOrigin = 'anonymous';
-    v.preload = 'auto';
-    v.load(); // force start load
+    v.preload = "auto";
+    container.appendChild(v); // Optional for debugging only
     return v;
   });
 
-  // Add dividers
-  const divider1 = document.createElement('div');
-  const divider2 = document.createElement('div');
-  divider1.className = 'divider';
-  divider2.className = 'divider';
+  const divider1 = document.createElement("div");
+  const divider2 = document.createElement("div");
+  divider1.className = "divider";
+  divider2.className = "divider";
   container.appendChild(divider1);
   container.appendChild(divider2);
 
   let dividerX1 = width / 3;
   let dividerX2 = 2 * width / 3;
-  divider1.style.left = dividerX1 + 'px';
-  divider2.style.left = dividerX2 + 'px';
+  divider1.style.left = `${dividerX1}px`;
+  divider2.style.left = `${dividerX2}px`;
 
   let dragging = null;
-  divider1.addEventListener('pointerdown', () => dragging = 1);
-  divider2.addEventListener('pointerdown', () => dragging = 2);
-  window.addEventListener('pointerup', () => dragging = null);
-  window.addEventListener('pointermove', e => {
+  divider1.addEventListener("pointerdown", () => dragging = 1);
+  divider2.addEventListener("pointerdown", () => dragging = 2);
+  window.addEventListener("pointerup", () => dragging = null);
+  window.addEventListener("pointermove", e => {
     if (!dragging) return;
-    const x = e.clientX - container.getBoundingClientRect().left;
+    const x = e.clientX;
     if (dragging === 1) {
       dividerX1 = Math.min(x, dividerX2 - 10);
       divider1.style.left = `${dividerX1}px`;
@@ -96,48 +98,52 @@
     }
   });
 
+  const textures = videos.map(v => new THREE.VideoTexture(v));
+  const planes = textures.map((tex, i) => {
+    tex.minFilter = THREE.LinearFilter;
+    tex.magFilter = THREE.LinearFilter;
+    const mat = new THREE.MeshBasicMaterial({ map: tex });
+    const geo = new THREE.PlaneGeometry(width, height);
+    const mesh = new THREE.Mesh(geo, mat);
+    mesh.position.z = -i;
+    scene.add(mesh);
+    return mesh;
+  });
+
   let readyCount = 0;
   videos.forEach(v => {
-    v.addEventListener('canplaythrough', () => {
+    v.addEventListener("canplaythrough", () => {
       readyCount++;
       if (readyCount === videos.length) {
-        const textures = videos.map(v => new THREE.VideoTexture(v));
-        const planes = textures.map((tex, i) => {
-          const mat = new THREE.MeshBasicMaterial({ map: tex });
-          const geo = new THREE.PlaneGeometry(width, height);
-          const mesh = new THREE.Mesh(geo, mat);
-          mesh.position.z = -i;
-          scene.add(mesh);
-          return mesh;
-        });
-
         videos.forEach(v => {
           v.currentTime = 0;
-          v.play().catch(err => console.error("Autoplay failed", err));
+          v.play().catch(console.warn);
         });
-
-        function animate() {
-          requestAnimationFrame(animate);
-          const w = container.clientWidth;
-          const h = container.clientHeight;
-
-          renderer.setScissor(0, 0, dividerX1, h);
-          renderer.setViewport(0, 0, dividerX1, h);
-          renderer.render(scene, camera);
-
-          renderer.setScissor(dividerX1, 0, dividerX2 - dividerX1, h);
-          renderer.setViewport(dividerX1, 0, dividerX2 - dividerX1, h);
-          renderer.render(scene, camera);
-
-          renderer.setScissor(dividerX2, 0, w - dividerX2, h);
-          renderer.setViewport(dividerX2, 0, w - dividerX2, h);
-          renderer.render(scene, camera);
-        }
-
         animate();
       }
     });
+    v.load();
   });
+
+  function animate() {
+    requestAnimationFrame(animate);
+    const w = container.clientWidth;
+    const h = container.clientHeight;
+    const x1 = dividerX1;
+    const x2 = dividerX2;
+
+    renderer.setScissor(0, 0, x1, h);
+    renderer.setViewport(0, 0, x1, h);
+    renderer.render(scene, camera);
+
+    renderer.setScissor(x1, 0, x2 - x1, h);
+    renderer.setViewport(x1, 0, x2 - x1, h);
+    renderer.render(scene, camera);
+
+    renderer.setScissor(x2, 0, w - x2, h);
+    renderer.setViewport(x2, 0, w - x2, h);
+    renderer.render(scene, camera);
+  }
 </script>
 </body>
 </html>
