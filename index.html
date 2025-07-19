@@ -1,106 +1,562 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <title>WebGL Triple Video Viewer</title>
-  <style>
-    body, html {
-      margin: 0;
-      padding: 0;
-      background: black;
-      height: 100%;
-    }
-    .webgl-container {
-      position: relative;
-      width: 100vw;
-      height: 100vh;
-    }
-    .divider {
-      position: absolute;
-      top: 0;
-      width: 4px;
-      height: 100%;
-      background: black;
-      z-index: 10;
-      cursor: ew-resize;
-    }
-    .divider::after {
-      content: '↔';
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      color: white;
-      font-size: 18px;
-    }
-  </style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sparfels - Project Page</title>
+
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro" rel="stylesheet">
+  <link rel="stylesheet" href="static/css/bulma.min.css">
+  <link rel="stylesheet" href="static/css/index.css">
+
+<style>
+  .video-compare-container {
+    margin-bottom: 2rem;
+  }
+
+  .video-wrapper-triple {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    background: #000;
+  }
+
+  .video-compare-container.triple .video-layer.videoA,
+  .video-compare-container.triple .video-layer.videoB,
+  .video-compare-container.triple .video-layer.videoC,
+  .video-layer {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    object-fit: contain;
+    background-color: black;
+  }
+
+  .videoB {
+    z-index: 1;
+    clip-path: inset(0 66.66% 0 0);
+  }
+
+  .videoC {
+    z-index: 2;
+    clip-path: inset(0 0 0 33.33%);
+  }
+
+  /* --- Divider Styling --- */
+  .divider {
+    position: absolute;
+    top: 0;
+    width: 2px;
+    height: 100%;
+    background-color: black;
+    z-index: 3;
+    cursor: ew-resize;
+    pointer-events: auto;
+    touch-action: none;
+  }
+  
+  /* Add a clean black double arrow in the middle */
+  .divider::after {
+    content: '↔';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 16px;
+    color: black;
+    user-select: none;
+    pointer-events: none;
+  }
+
+
+  .divider1 { left: 33.33%; }
+  .divider2 { left: 66.66%; }
+</style>
+  
 </head>
-
 <body>
-  <div id="webgl-container" style="width: 100vw; height: 100vh; position: relative;"></div>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r152/three.min.js"></script>
+
+  <section class="hero">
+    <div class="hero-body">
+      <div class="container is-max-desktop">
+        <div class="columns is-centered">
+          <div class="column has-text-centered">
+            <h1 class="title is-1 publication-title">Sparfels: Fast Reconstruction from Sparse Unposed Imagery</h1>
+            <div class="is-size-3 publication-authors">
+              <!-- Paper authors -->
+              <span class="author-block">
+                <a href="https://scholar.google.com/citations?user=COw5y4EAAAAJ&hl=en" target="_blank">Shubhendu Jena<sup>†</sup></a>,</span>
+                <span class="author-block">
+                  <a href="https://ouasfi.github.io/" target="_blank">Amine Ouasfi<sup>†</sup></a>,</span>
+                  <span class="author-block">
+                    <a href="https://orcid.org/0000-0002-4831-3343" target="_blank">Mae Younes</a>,</span>
+                    <span class="author-block">
+                      <a href="https://boukhayma.github.io/" target="_blank">Adnane Boukhayma</a></span>
+                  </span>
+                </div>
+
+                <div class="is-size-6" style="margin-top: 0.5em;">
+                 <sup>†</sup>Equal contribution
+                </div>
+
+                  <div class="is-size-3 publication-authors">
+                    <img src="./static/inria_logo.png" alt="INRIA Logo" style="max-height: 1.2em;"><br><b>ICCV 2025</b>
+                    <!-- <span class="eql-cntrb"><small><br><sup>*</sup>Indicates Equal Contribution</small></span> -->
+                  </div>
+
+                  <div class="column has-text-centered">
+                    <div class="publication-links">
+                         <!-- Arxiv PDF link -->
+                      <span class="link-block">
+                        <a href="https://www.arxiv.org/pdf/2505.02178" target="_blank"
+                        class="external-link button is-normal is-rounded is-dark">
+                        <span class="icon">
+                          <i class="fas fa-file-pdf"></i>
+                        </span>
+                        <span>Paper</span>
+                      </a>
+                    </span>
+
+                    <!-- Supplementary PDF link -->
+                    <!-- <span class="link-block">
+                      <a href="static/pdfs/supplementary_material.pdf" target="_blank"
+                      class="external-link button is-normal is-rounded is-dark">
+                      <span class="icon">
+                        <i class="fas fa-file-pdf"></i>
+                      </span>
+                      <span>Supplementary</span>
+                    </a>
+                  </span> -->
+
+                  <!-- Github link -->
+                  <span class="link-block">
+                    <a href="https://github.com/Shubhendu-Jena/Sparfels" target="_blank"
+                    class="external-link button is-normal is-rounded is-dark">
+                    <span class="icon">
+                      <i class="fab fa-github"></i>
+                    </span>
+                    <span>Code (Coming soon)</span>
+                  </a>
+                </span>
+
+                <!-- ArXiv abstract Link -->
+                <span class="link-block">
+                  <a href="https://www.arxiv.org/pdf/2505.02178" target="_blank"
+                  class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                    <i class="ai ai-arxiv"></i>
+                  </span>
+                  <span>arXiv</span>
+                </a>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- Teaser video-->
+<section class="hero teaser">
+  <div class="container is-max-desktop">
+    <div class="hero-body">
+      <img src="./static/teaser.png" class="center"></img>
+      <div class="content has-text-justified">
+        <p>
+          <b>Fast training of Sparfels.</b> Examples of reconstruction meshes obtained within <strong>3 minutes</strong> from sparse pose-free images via our method. We used here <strong>6 (left) and 3 (right) input images</strong> respectively from scenes of datasets MVImgNet and BMVS.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- End teaser video -->
+
+<!-- Paper abstract -->
+<section class="section hero is-light">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">Abstract</h2>
+        <div class="content has-text-justified">
+          <p>
+            We present a method for <strong>Spar</strong>se view reconstruction with sur<strong>f</strong>ace <strong>el</strong>ement splatting that runs within 3 minutes on a consumer-grade GPU. While few methods address sparse radiance field learning from noisy or unposed sparse cameras, shape recovery remains relatively underexplored in this setting. Several radiance and shape learning test-time optimization methods address the sparse posed setting by learning data priors or using combinations of external monocular geometry priors. Differently, we propose an efficient and simple pipeline harnessing a single recent 3D foundation model. We leverage its various task heads, notably point maps and camera initializations to instantiate a bundle adjusting 2D Gaussian Splatting (2DGS) model, and image correspondences to guide camera optimization midst 2DGS training. Key to our contribution is a novel formulation of splatted color variance along rays, which can be computed efficiently. Reducing this moment in training leads to more accurate shape reconstructions. We demonstrate state-of-the-art performances in the sparse uncalibrated setting in reconstruction and novel view benchmarks based on established multi-view datasets.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- End paper abstract -->
+
+
+
+
+
+  
+<section class="section">
+  <div class="container is-max-desktop">
+    <h2 class="title is-3 has-text-centered">Interactive Comparisons</h2>
+
+    <!-- DTU Section -->
+    <h3 class="title is-5 has-text-centered">DTU</h3>
+    <div class="columns is-multiline is-centered">
+
+      <!-- DTU Scan 24 -->
+      <div class="column is-half" data-videoset="dtu_scan24">
+        <div class="video-compare-container triple">
+          <div class="video-wrapper-triple" style="aspect-ratio: 4 / 3;">
+            <video class="video-layer videoA" muted playsinline preload="auto" decoding="async" loop data-src="static/videos/scan_dtu_24_sparfels.webm"></video>
+            <video class="video-layer videoB" muted playsinline preload="auto" decoding="async" loop data-src="static/videos/scan_dtu_24_instantsplat.webm"></video>
+            <video class="video-layer videoC" muted playsinline preload="auto" decoding="async" loop data-src="static/videos/scan_dtu_24_sparsecraft.webm"></video>
+            <div class="divider divider1"></div>
+            <div class="divider divider2"></div>
+          </div>
+          <p class="has-text-centered"><small>Scan 24: InstantSplat vs. Sparfels vs. SparseCraft</small></p>
+        </div>
+      </div>
+
+      <!-- DTU Scan 65 -->
+      <div class="column is-half" data-videoset="dtu_scan65">
+        <div class="video-compare-container triple">
+          <div class="video-wrapper-triple" style="aspect-ratio: 4 / 3;">
+            <video class="video-layer videoA" muted playsinline preload="auto" decoding="async" loop data-src="static/videos/scan_dtu_65_sparfels.webm"></video>
+            <video class="video-layer videoB" muted playsinline preload="auto" decoding="async" loop data-src="static/videos/scan_dtu_65_instantsplat.webm"></video>
+            <video class="video-layer videoC" muted playsinline preload="auto" decoding="async" loop data-src="static/videos/scan_dtu_65_sparsecraft.webm"></video>
+            <div class="divider divider1"></div>
+            <div class="divider divider2"></div>
+          </div>
+          <p class="has-text-centered"><small>Scan 65: InstantSplat vs. Sparfels vs. SparseCraft</small></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- BlendedMVS Section -->
+    <h3 class="title is-5 has-text-centered">BlendedMVS</h3>
+    <div class="columns is-multiline is-centered">
+
+      <!-- BMVS Scan 120 -->
+      <div class="column is-half" data-videoset="bmvs_scan120">
+        <div class="video-compare-container triple">
+          <div class="video-wrapper-triple" style="aspect-ratio: 370 / 281;">
+            <video class="video-layer videoA" muted playsinline preload="auto" decoding="async" loop data-src="static/videos/scan_bmvs_120_sparfels.webm"></video>
+            <video class="video-layer videoB" muted playsinline preload="auto" decoding="async" loop data-src="static/videos/scan_bmvs_120_uforecon.webm"></video>
+            <video class="video-layer videoC" muted playsinline preload="auto" decoding="async" loop data-src="static/videos/scan_bmvs_120_colmap.webm"></video>
+            <div class="divider divider1"></div>
+            <div class="divider divider2"></div>
+          </div>
+          <p class="has-text-centered"><small>Scan 120: UFORecon vs. Sparfels vs. COLMAP</small></p>
+        </div>
+      </div>
+
+      <!-- BMVS Scan 350 -->
+      <div class="column is-half" data-videoset="bmvs_scan350">
+        <div class="video-compare-container triple">
+          <div class="video-wrapper-triple" style="aspect-ratio: 382 / 287;">
+            <video class="video-layer videoA" muted playsinline preload="auto" decoding="async" loop data-src="static/videos/scan_bmvs_350_sparfels.webm"></video>
+            <video class="video-layer videoB" muted playsinline preload="auto" decoding="async" loop data-src="static/videos/scan_bmvs_350_uforecon.webm"></video>
+            <video class="video-layer videoC" muted playsinline preload="auto" decoding="async" loop data-src="static/videos/scan_bmvs_350_colmap.webm"></video>
+            <div class="divider divider1"></div>
+            <div class="divider divider2"></div>
+          </div>
+          <p class="has-text-centered"><small>Scan 350: UFORecon vs. Sparfels vs. COLMAP</small></p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+
+
+
+
+
+
+
+
+<!-- Results -->
+<section class="section">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-full-width">
+        <h2 class="title is-3">Comparison Results</h2>
+        <img src="./static/dtu.png" class="center"></img>
+        <div class="content has-text-justified">
+          <p>
+            Visual comparisons on the sparse reconstruction setting of DTU dataset.
+          </p>
+        </div>
+        <img src="./static/mvimg.png" class="center"></img>
+        <div class="content has-text-justified">
+          <p>
+            Visual comparison of surface reconstruction results on MVImgNet (first 5) and MipNeRF360 (last 2) datasets.
+          </p>
+        </div>
+        <img src="./static/bmvs.png" class="center"></img>
+        <div class="content has-text-justified">
+          <p>
+            Visual comparison of surface reconstruction results on BlendedMVS dataset.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- End results -->
+            
+<!-- Image carousel -->
+<!-- <section class="hero is-small">
+  <div class="hero-body">
+    <div class="container">
+      <div id="results-carousel" class="carousel results-carousel">
+       <div class="item">
+        <img src="static/images/carousel1.jpg" alt="MY ALT TEXT"/>
+        <h2 class="subtitle has-text-centered">
+          First image description.
+        </h2>
+      </div>
+      <div class="item">
+        <img src="static/images/carousel2.jpg" alt="MY ALT TEXT"/>
+        <h2 class="subtitle has-text-centered">
+          Second image description.
+        </h2>
+      </div>
+      <div class="item">
+        <img src="static/images/carousel3.jpg" alt="MY ALT TEXT"/>
+        <h2 class="subtitle has-text-centered">
+         Third image description.
+       </h2>
+     </div>
+     <div class="item">
+      <img src="static/images/carousel4.jpg" alt="MY ALT TEXT"/>
+      <h2 class="subtitle has-text-centered">
+        Fourth image description.
+      </h2>
+    </div>
+  </div>
+</div>
+</div>
+</section> -->
+<!-- End image carousel -->
+
+
+
+
+<!-- Youtube video -->
+<!-- <section class="hero is-small is-light">
+  <div class="hero-body">
+    <div class="container">
+      <h2 class="title is-3">Video Presentation</h2>
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-four-fifths">
+
+          <div class="publication-video">
+            <iframe src="https://www.youtube.com/embed/JkaxUblCGz0" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section> -->
+<!-- End youtube video -->
+
+
+<!-- Video carousel -->
+<!-- <section class="hero is-small">
+  <div class="hero-body">
+    <div class="container">
+      <h2 class="title is-3">Another Carousel</h2>
+      <div id="results-carousel" class="carousel results-carousel">
+        <div class="item item-video1">
+          <video poster="" id="video1" autoplay controls muted loop height="100%">
+            <source src="static/videos/carousel1.mp4"
+            type="video/mp4">
+          </video>
+        </div>
+        <div class="item item-video2">
+          <video poster="" id="video2" autoplay controls muted loop height="100%">
+            <source src="static/videos/carousel2.mp4"
+            type="video/mp4">
+          </video>
+        </div>
+        <div class="item item-video3">
+          <video poster="" id="video3" autoplay controls muted loop height="100%">\
+            <source src="static/videos/carousel3.mp4"
+            type="video/mp4">
+          </video>
+        </div>
+      </div>
+    </div>
+  </div>
+</section> -->
+<!-- End video carousel -->
+
+
+
+
+
+
+<!-- Paper poster -->
+<!-- <section class="hero is-small is-light">
+  <div class="hero-body">
+    <div class="container">
+      <h2 class="title">Poster</h2>
+
+      <iframe  src="static/pdfs/sample.pdf" width="100%" height="550">
+          </iframe>
+
+      </div>
+    </div>
+  </section> -->
+<!--End paper poster -->
+
+
+<!--BibTex citation -->
+  <section class="section" id="BibTeX">
+    <div class="container is-max-desktop content">
+      <h2 class="title">BibTeX</h2>
+      <pre><code>@article{jena2025sparfels,
+  title={Sparfels: Fast Reconstruction from Sparse Unposed Imagery},
+  author={Jena, Shubhendu and Ouasfi, Amine and Younes, Mae and Boukhayma, Adnane},
+  journal={arXiv preprint arXiv:},
+  year={2025}
+}</code></pre>
+    </div>
+</section>
+<!--End BibTex citation -->
+
+
+  <footer class="footer">
+  <div class="container">
+    <div class="columns is-centered">
+      <div class="column is-8">
+        <div class="content">
+
+          <p>
+            This page was built using the <a href="https://github.com/eliahuhorwitz/Academic-project-page-template" target="_blank">Academic Project Page Template</a> which was adopted from the <a href="https://nerfies.github.io" target="_blank">Nerfies</a> project page.
+            <br> This website is licensed under a <a rel="license"  href="http://creativecommons.org/licenses/by-sa/4.0/" target="_blank">Creative
+            Commons Attribution-ShareAlike 4.0 International License</a>.
+          </p>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- Statcounter tracking code -->
+
+<!-- You can add a tracker to track page visits by creating an account at statcounter.com -->
+
+    <!-- End of Statcounter Code -->
+
   <script>
-    const container = document.getElementById("webgl-container");
-    const width = container.clientWidth;
-    const height = container.clientHeight;
-
-    const renderer = new THREE.WebGLRenderer({ antialias: true });
-    renderer.setSize(width, height);
-    container.appendChild(renderer.domElement);
-
-    const scene = new THREE.Scene();
-    const camera = new THREE.OrthographicCamera(0, width, height, 0, -1, 1);
-
-    const paths = [
-      "static/videos/scan_dtu_24_sparfels.webm",
-      "static/videos/scan_dtu_24_instantsplat.webm",
-      "static/videos/scan_dtu_24_sparsecraft.webm"
-    ];
-
-    const videos = paths.map((src) => {
-      const v = document.createElement("video");
-      v.src = src;
-      v.muted = true;
-      v.loop = true;
-      v.playsInline = true;
-      v.preload = "auto";
-      v.crossOrigin = "anonymous";
-      v.load();
-      return v;
-    });
-
-    let textures = [], planes = [];
-
-    function initTexturesAndPlanes() {
-      textures = videos.map((v) => new THREE.VideoTexture(v));
-      planes = textures.map((tex, i) => {
-        const mat = new THREE.MeshBasicMaterial({ map: tex });
-        const geo = new THREE.PlaneGeometry(width, height);
-        const mesh = new THREE.Mesh(geo, mat);
-        mesh.position.z = -i;
-        scene.add(mesh);
-        return mesh;
-      });
+  function syncTripleVideos(videoA, videoB, videoC) {
+    function step() {
+      const t = videoA.currentTime;
+      if (Math.abs(videoB.currentTime - t) > 0.01) videoB.currentTime = t;
+      if (Math.abs(videoC.currentTime - t) > 0.01) videoC.currentTime = t;
+      videoA.requestVideoFrameCallback(step);
     }
+    videoA.requestVideoFrameCallback(step);
+  }
+  </script>
 
-    function animate() {
-      requestAnimationFrame(animate);
-      renderer.render(scene, camera);
-    }
 
-    let ready = 0;
-    videos.forEach((v) => {
-      v.addEventListener("canplaythrough", () => {
-        ready++;
-        if (ready === videos.length) {
-          videos.forEach((v) => v.play().catch(console.warn));
-          initTexturesAndPlanes();
-          animate();
+  <script>
+  document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('[data-videoset]').forEach(set => {
+      const wrapper = set.querySelector('.video-wrapper-triple');
+      const [videoA, videoB, videoC] = [
+        wrapper.querySelector('.videoA'),
+        wrapper.querySelector('.videoB'),
+        wrapper.querySelector('.videoC')
+      ];
+      const [divider1, divider2] = [
+        wrapper.querySelector('.divider1'),
+        wrapper.querySelector('.divider2')
+      ];
+  
+      // Lazy load
+      [videoA, videoB, videoC].forEach(v => {
+        if (!v.src && v.dataset.src) {
+          v.src = v.dataset.src;
+          v.load();
         }
       });
-    });
-  </script>
-</body>
   
-</html>
+      // Wait for all to be ready
+      let loaded = 0;
+      const checkReady = () => {
+        loaded++;
+        if (loaded === 3) {
+          [videoA, videoB, videoC].forEach(v => {
+            v.pause();
+            v.currentTime = 0;
+          });
+          requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+              [videoA, videoB, videoC].forEach(v => v.play().catch(() => {}));
+              syncTripleVideos(videoA, videoB, videoC);  // <== Call it here
+            });
+          });
+        }
+      };
+
+  
+      [videoA, videoB, videoC].forEach(v => {
+        v.addEventListener('canplaythrough', checkReady, { once: true });
+      });
+  
+      // Sync correction loop
+      function syncLoop() {
+        const t = videoA.currentTime;
+        if (Math.abs(videoB.currentTime - t) > 0.02) videoB.currentTime = t;
+        if (Math.abs(videoC.currentTime - t) > 0.02) videoC.currentTime = t;
+        requestAnimationFrame(syncLoop);
+      }
+  
+      // Divider drag
+      let dragging = null;
+      function updateClips(l, r) {
+        videoB.style.clipPath = `inset(0 ${100 - l}% 0 0)`;
+        videoC.style.clipPath = `inset(0 0 0 ${r}%)`;
+        divider1.style.left = `${l}%`;
+        divider2.style.left = `${r}%`;
+      }
+      updateClips(33.33, 66.66);
+  
+      const startDrag = id => e => {
+        dragging = id;
+        wrapper.setPointerCapture(e.pointerId);
+      };
+      const stopDrag = () => dragging = null;
+      const moveDrag = e => {
+        if (!dragging) return;
+        const rect = wrapper.getBoundingClientRect();
+        const percent = ((e.clientX - rect.left) / rect.width) * 100;
+        const clamped = Math.min(Math.max(percent, 0), 100);
+        const l = parseFloat(divider1.style.left || '33.33');
+        const r = parseFloat(divider2.style.left || '66.66');
+        if (dragging === 1 && clamped < r) updateClips(clamped, r);
+        if (dragging === 2 && clamped > l) updateClips(l, clamped);
+      };
+  
+      divider1.addEventListener('pointerdown', startDrag(1));
+      divider2.addEventListener('pointerdown', startDrag(2));
+      wrapper.addEventListener('pointermove', moveDrag);
+      wrapper.addEventListener('pointerup', stopDrag);
+      wrapper.addEventListener('pointercancel', stopDrag);
+    });
+  });
+  </script>
+
+
+
+  </body>
+  </html>
