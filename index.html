@@ -35,116 +35,72 @@
     }
   </style>
 </head>
+
 <body>
-<video src="static/videos/scan_dtu_24_sparfels.webm" controls autoplay muted loop></video>
-<div class="webgl-container" id="viewer"></div>
+  <div id="webgl-container" style="width: 100vw; height: 100vh; position: relative;"></div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r152/three.min.js"></script>
-<script>
-  const container = document.getElementById("viewer");
-  const width = container.clientWidth;
-  const height = container.clientHeight;
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r152/three.min.js"></script>
+  <script>
+    const container = document.getElementById("webgl-container");
+    const width = container.clientWidth;
+    const height = container.clientHeight;
 
-  const renderer = new THREE.WebGLRenderer({ antialias: true });
-  renderer.setSize(width, height);
-  renderer.setScissorTest(true);
-  container.appendChild(renderer.domElement);
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(width, height);
+    container.appendChild(renderer.domElement);
 
-  const scene = new THREE.Scene();
-  const camera = new THREE.OrthographicCamera(0, width, height, 0, -1, 1);
+    const scene = new THREE.Scene();
+    const camera = new THREE.OrthographicCamera(0, width, height, 0, -1, 1);
 
-  const paths = [
-    "static/videos/scan_dtu_24_sparfels.webm",
-    "static/videos/scan_dtu_24_instantsplat.webm",
-    "static/videos/scan_dtu_24_sparsecraft.webm"
-  ];
+    const paths = [
+      "static/videos/scan_dtu_24_sparfels.webm",
+      "static/videos/scan_dtu_24_instantsplat.webm",
+      "static/videos/scan_dtu_24_sparsecraft.webm"
+    ];
 
-  const videos = paths.map(path => {
-    const v = document.createElement("video");
-    v.src = path;
-    v.crossOrigin = "anonymous";
-    v.loop = true;
-    v.muted = true;
-    v.playsInline = true;
-    v.preload = "auto";
-    container.appendChild(v); // Optional for debugging only
-    return v;
-  });
-
-  const divider1 = document.createElement("div");
-  const divider2 = document.createElement("div");
-  divider1.className = "divider";
-  divider2.className = "divider";
-  container.appendChild(divider1);
-  container.appendChild(divider2);
-
-  let dividerX1 = width / 3;
-  let dividerX2 = 2 * width / 3;
-  divider1.style.left = `${dividerX1}px`;
-  divider2.style.left = `${dividerX2}px`;
-
-  let dragging = null;
-  divider1.addEventListener("pointerdown", () => dragging = 1);
-  divider2.addEventListener("pointerdown", () => dragging = 2);
-  window.addEventListener("pointerup", () => dragging = null);
-  window.addEventListener("pointermove", e => {
-    if (!dragging) return;
-    const x = e.clientX;
-    if (dragging === 1) {
-      dividerX1 = Math.min(x, dividerX2 - 10);
-      divider1.style.left = `${dividerX1}px`;
-    } else {
-      dividerX2 = Math.max(x, dividerX1 + 10);
-      divider2.style.left = `${dividerX2}px`;
-    }
-  });
-
-  const textures = videos.map(v => new THREE.VideoTexture(v));
-  const planes = textures.map((tex, i) => {
-    tex.minFilter = THREE.LinearFilter;
-    tex.magFilter = THREE.LinearFilter;
-    const mat = new THREE.MeshBasicMaterial({ map: tex });
-    const geo = new THREE.PlaneGeometry(width, height);
-    const mesh = new THREE.Mesh(geo, mat);
-    mesh.position.z = -i;
-    scene.add(mesh);
-    return mesh;
-  });
-
-  let readyCount = 0;
-  videos.forEach(v => {
-    v.addEventListener("canplaythrough", () => {
-      readyCount++;
-      if (readyCount === videos.length) {
-        videos.forEach(v => {
-          v.currentTime = 0;
-          v.play().catch(console.warn);
-        });
-        animate();
-      }
+    const videos = paths.map((src) => {
+      const v = document.createElement("video");
+      v.src = src;
+      v.muted = true;
+      v.loop = true;
+      v.playsInline = true;
+      v.preload = "auto";
+      v.crossOrigin = "anonymous";
+      v.load();
+      return v;
     });
-    v.load();
-  });
 
-  function animate() {
-    requestAnimationFrame(animate);
-    const w = container.clientWidth;
-    const h = container.clientHeight;
-    const x1 = dividerX1;
-    const x2 = dividerX2;
+    let textures = [], planes = [];
 
-    renderer.setScissor(0, 0, x1, h);
-    renderer.setViewport(0, 0, x1, h);
-    renderer.render(scene, camera);
+    function initTexturesAndPlanes() {
+      textures = videos.map((v) => new THREE.VideoTexture(v));
+      planes = textures.map((tex, i) => {
+        const mat = new THREE.MeshBasicMaterial({ map: tex });
+        const geo = new THREE.PlaneGeometry(width, height);
+        const mesh = new THREE.Mesh(geo, mat);
+        mesh.position.z = -i;
+        scene.add(mesh);
+        return mesh;
+      });
+    }
 
-    renderer.setScissor(x1, 0, x2 - x1, h);
-    renderer.setViewport(x1, 0, x2 - x1, h);
-    renderer.render(scene, camera);
+    function animate() {
+      requestAnimationFrame(animate);
+      renderer.render(scene, camera);
+    }
 
-    renderer.setScissor(x2, 0, w - x2, h);
-    renderer.setViewport(x2, 0, w - x2, h);
-    renderer.render(scene, camera);
-  }
-</script>
+    let ready = 0;
+    videos.forEach((v) => {
+      v.addEventListener("canplaythrough", () => {
+        ready++;
+        if (ready === videos.length) {
+          videos.forEach((v) => v.play().catch(console.warn));
+          initTexturesAndPlanes();
+          animate();
+        }
+      });
+    });
+  </script>
 </body>
+  
 </html>
