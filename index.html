@@ -448,12 +448,12 @@
       const videoA = wrapper.querySelector('.videoA');
       const videoB = wrapper.querySelector('.videoB');
       const divider = wrapper.querySelector('.divider');
-  
-      // Lazy load
+
       [videoA, videoB].forEach(v => {
+        v.preload = 'none'; // prevent automatic preload
         if (!v.src && v.dataset.src) {
           v.src = v.dataset.src;
-          v.load();
+          v.load(); // trigger explicit load
         }
       });
   
@@ -473,12 +473,14 @@
           }, 100); // wait a bit to avoid frame skip
         }
       };
-      
+
       const syncLoop = () => {
-        function step() {
-          const diff = Math.abs(videoA.currentTime - videoB.currentTime);
-          if (diff > 0.01) {
-            videoB.currentTime = videoA.currentTime;
+        function step(now, metadata) {
+          const tA = videoA.currentTime;
+          const tB = videoB.currentTime;
+          const delta = Math.abs(tA - tB);
+          if (delta > 0.01) {
+            videoB.currentTime = tA;
           }
           videoA.requestVideoFrameCallback(step);
         }
@@ -489,6 +491,9 @@
       videoB.addEventListener('canplaythrough', onReady, { once: true });
 
 
+
+
+      
   
       // Sync loop
       function syncVideos(a, b) {
