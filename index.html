@@ -465,12 +465,15 @@
           videoB.pause();
           videoA.currentTime = 0;
           videoB.currentTime = 0;
-      
-          setTimeout(() => {
-            Promise.all([videoA.play(), videoB.play()]).then(() => {
-              syncLoop();
+
+          Promise.all([videoA.play(), videoB.play()])
+            .then(() => syncLoop())
+            .catch(err => {
+              console.warn("Playback blocked, waiting for user interaction");
+              document.body.addEventListener('click', () => {
+                videoA.play(); videoB.play(); syncLoop();
+              }, { once: true });
             });
-          }, 100); // wait a bit to avoid frame skip
         }
       };
 
