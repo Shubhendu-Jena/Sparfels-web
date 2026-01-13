@@ -92,6 +92,25 @@
   .cvf-link .icon {
     margin-right: 0.4em;
   }
+  .conf-line {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .highlight-badge {
+    display: inline-block;
+    padding: 0.15em 0.6em;
+    border-radius: 999px;
+    font-weight: 800;
+    font-size: 0.75em;
+    letter-spacing: 0.04em;
+    background: #D4AF37;
+    color: #111;
+    vertical-align: middle;
+  }
 </style>
   
 </head>
@@ -122,9 +141,13 @@
                 </div>
 
                 <div class="is-size-3 publication-authors">
-                  <img src="./static/inria_logo.png" alt="INRIA Logo" style="max-height: 1.2em;"><br><b>ICCV 2025</b>
-                  <!-- <span class="eql-cntrb"><small><br><sup>*</sup>Indicates Equal Contribution</small></span> -->
+                  <img src="./static/inria_logo.png" alt="INRIA Logo" style="max-height: 1.2em;"><br>
+                  <span class="conf-line">
+                    <b>ICCV 2025</b>
+                    <span class="highlight-badge">HIGHLIGHT</span>
+                  </span>
                 </div>
+
 
                   <div class="column has-text-centered">
                     <div class="publication-links">
