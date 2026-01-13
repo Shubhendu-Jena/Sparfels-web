@@ -97,17 +97,16 @@
     align-items:baseline;
     gap:.35rem;
     justify-content:center;
-    flex-wrap:wrap;
+    white-space:nowrap;
   }
   
-  .conf-highlight{
-    font-size:.62em;
-    font-weight:600;
+  .conf-hl{
+    font-size:0.62em;
+    font-weight:650;
     font-variant:small-caps;
-    letter-spacing:.12em;
-    color:rgba(0,0,0,.62);
-    position:relative;
-    top:-0.35em;          /* lifts it like a superscript */
+    letter-spacing:0.14em;
+    color:#1f2a44;            /* muted navy */
+    opacity:0.85;
   }
 </style>
   
@@ -141,7 +140,8 @@
                 <div class="is-size-3 publication-authors">
                   <img src="./static/inria_logo.png" alt="INRIA Logo" style="max-height: 1.2em;"><br>
                   <span class="conf-line">
-                    <b>ICCV 2025</b><span class="conf-highlight">Highlight</span>
+                    <b>ICCV 2025</b>
+                    <span class="conf-hl">Highlight</span>
                   </span>
                 </div>
 
